@@ -19,8 +19,7 @@ export default async function AdminPortfolioPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Portfolio Management</h1>
         <p className="text-gray-600 mt-2">
-          Manage your portfolio projects with multiple image uploads. Support for Photography, Product Shoot, and
-          Perfume categories.
+          Showcase your best work. Add project images, descriptions, and client details.
         </p>
       </div>
       <PortfolioManagement />

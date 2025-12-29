@@ -24,7 +24,6 @@ import {
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { PayPalPaymentForm } from "./paypal-payment-form"
-import { getPayPalClientId } from "@/lib/paypal/paypal-client"
 
 interface Transaction {
   id: string
@@ -50,9 +49,8 @@ export function WalletManagement({ clientId, balance, transactions }: WalletMana
   const [bankSlip, setBankSlip] = useState<File | null>(null)
   const [notes, setNotes] = useState("")
   const [loading, setLoading] = useState(false)
-  const [paypalClientId] = useState(() => getPayPalClientId())
-  const router = useRouter()
   const [showPayPalForm, setShowPayPalForm] = useState(false)
+  const router = useRouter()
 
   const handleAddFunds = async () => {
     if (!amount || Number.parseFloat(amount) <= 0) return
@@ -312,7 +310,7 @@ export function WalletManagement({ clientId, balance, transactions }: WalletMana
 
               {paymentMethod === "card" && showPayPalForm && amount && (
                 <PayPalPaymentForm
-                  clientId={paypalClientId}
+                  clientId={clientId}
                   amount={Number.parseFloat(amount)}
                   onSuccess={handlePayPalSuccess}
                   onError={(error) => {

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, FileText, Send, CheckCircle, Clock, AlertCircle, Download, Search, X, Eye } from "lucide-react"
-import { toast } from "react-toastify"
 
 interface Invoice {
   id: string
@@ -74,11 +73,6 @@ export function InvoicesAdminManagement() {
     const processingFee = amount * 0.04
     const totalAmount = amount + taxAmount + processingFee
 
-    if (!form.client_id) {
-      toast.error("Please select a client")
-      return
-    }
-
     // Generate invoice number
     const { data: existingInvoices } = await supabase
       .from("invoices")
@@ -102,20 +96,11 @@ export function InvoicesAdminManagement() {
     })
 
     if (!error) {
-      toast.success(`✓ Invoice ${invoiceNumber} created successfully!`)
       setShowCreate(false)
       setForm({ client_id: "", amount: "", tax_rate: "0", due_date: "", notes: "" })
       fetchData()
     } else {
-      if (error.message.includes("row-level security")) {
-        toast.error("Permission denied: You don't have permission to create invoices. Contact your admin.")
-        console.error("[v0] RLS Policy Error - User may not have proper role:", error)
-      } else if (error.message.includes("duplicate")) {
-        toast.error("Invoice number already exists. Please try again.")
-      } else {
-        toast.error(`Error creating invoice: ${error.message}`)
-      }
-      console.error("[v0] Invoice creation error:", error)
+      alert("Error creating invoice: " + error.message)
     }
   }
 
@@ -125,15 +110,8 @@ export function InvoicesAdminManagement() {
       updates.paid_date = new Date().toISOString().split("T")[0]
     }
 
-    const { error } = await supabase.from("invoices").update(updates).eq("id", id)
-    if (!error) {
-      toast.success(`✓ Invoice marked as ${status}`)
-      fetchData()
-      console.log("[v0] Invoice status updated:", status)
-    } else {
-      console.error("[v0] Status update error:", error)
-      toast.error(`Failed to update status: ${error.message}`)
-    }
+    await supabase.from("invoices").update(updates).eq("id", id)
+    fetchData()
   }
 
   const getClient = (clientId: string) => {

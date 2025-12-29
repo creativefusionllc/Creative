@@ -269,8 +269,6 @@ export function WebsiteCmsManager() {
         return
       }
 
-      console.log("[v0] Saving CMS with sections count:", sections.length)
-
       const { error: settingsError } = await supabase.from("website_settings").upsert(
         {
           id: "main",
@@ -309,9 +307,8 @@ export function WebsiteCmsManager() {
         }),
       }).catch(() => {})
 
-      toast.success(`✓ All changes saved! (${sections.length} sections updated)`)
+      toast.success("All changes saved successfully!")
       setHasUnsavedChanges(false)
-      console.log("[v0] CMS saved successfully")
     } catch (error: any) {
       console.error("[v0] CMS Save Error:", error)
       toast.error(`Failed to save: ${error.message || "Unknown error"}`)

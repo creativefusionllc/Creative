@@ -5,7 +5,6 @@ import { Check, ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { createBrowserClient } from "@/lib/supabase/client"
-import { useRealtimeUpdates } from "@/hooks/use-realtime-updates"
 
 interface Package {
   id: string
@@ -283,56 +282,50 @@ export function PricingPackagesSection() {
   const [activeCategory, setActiveCategory] = useState(0)
   const [packages, setPackages] = useState<Record<string, Package[]>>(fallbackPackages)
 
-  useRealtimeUpdates("packages", (payload) => {
-    console.log("[v0] Pricing updated:", payload)
-    fetchPackages()
-  })
-
   useEffect(() => {
+    async function fetchPackages() {
+      const supabase = createBrowserClient()
+      const { data, error } = await supabase
+        .from("packages")
+        .select("*")
+        .eq("is_active", true)
+        .order("price", { ascending: true })
+
+      if (data && data.length > 0 && !error) {
+        const grouped: Record<string, Package[]> = {}
+
+        data.forEach((pkg) => {
+          const cat = pkg.category || "branding"
+          if (!grouped[cat]) grouped[cat] = []
+
+          grouped[cat].push({
+            id: pkg.id,
+            name: pkg.name,
+            category: pkg.category,
+            price: pkg.price,
+            currency: pkg.currency || "AED",
+            duration: pkg.duration,
+            features: Array.isArray(pkg.features) ? pkg.features : pkg.features?.items || [],
+            is_featured: pkg.is_featured || false,
+            is_special_offer: pkg.is_special_offer || false,
+            discount_percentage: pkg.discount_percentage || 0,
+            original_price: pkg.original_price,
+          })
+        })
+
+        const merged = { ...fallbackPackages }
+        Object.keys(grouped).forEach((key) => {
+          if (grouped[key].length > 0) {
+            merged[key] = grouped[key].slice(0, 3)
+          }
+        })
+
+        setPackages(merged)
+      }
+    }
+
     fetchPackages()
   }, [])
-
-  async function fetchPackages() {
-    const supabase = createBrowserClient()
-    const { data, error } = await supabase
-      .from("packages")
-      .select("*")
-      .eq("is_active", true)
-      .order("price", { ascending: true })
-
-    if (data && data.length > 0 && !error) {
-      const grouped: Record<string, Package[]> = {}
-
-      data.forEach((pkg) => {
-        const cat = (pkg.category || "branding").toLowerCase().replace(/\s+/g, "-")
-        if (!grouped[cat]) grouped[cat] = []
-
-        grouped[cat].push({
-          id: pkg.id,
-          name: pkg.name,
-          category: cat,
-          price: pkg.price,
-          currency: pkg.currency || "AED",
-          duration: pkg.duration,
-          features: Array.isArray(pkg.features) ? pkg.features : pkg.features?.items || [],
-          is_featured: pkg.is_featured || false,
-          is_special_offer: pkg.is_special_offer || false,
-          discount_percentage: pkg.discount_percentage || 0,
-          original_price: pkg.original_price,
-        })
-      })
-
-      const merged = { ...fallbackPackages }
-      Object.keys(grouped).forEach((key) => {
-        if (grouped[key].length > 0) {
-          merged[key] = grouped[key].slice(0, 3)
-        }
-      })
-
-      console.log("[v0] Pricing packages updated:", Object.keys(merged))
-      setPackages(merged)
-    }
-  }
 
   const currentCategory = categories[activeCategory]
   const currentPackages = packages[currentCategory.id] || fallbackPackages.branding

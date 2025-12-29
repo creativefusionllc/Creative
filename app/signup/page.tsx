@@ -1,73 +1,59 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import Link from "next/link"
 import { AlertCircle, Loader2, Building2, Eye, EyeOff } from "lucide-react"
 
-export default function UnifiedLoginPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<"user" | "admin">("user")
-  const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const supabase = createClient()
 
   const brandColor = "#C4D600"
 
-  useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail")
-    const savedPassword = localStorage.getItem("rememberedPassword")
-
-    if (savedEmail) {
-      setEmail(savedEmail)
-      setRememberMe(true)
-    }
-    if (savedPassword) {
-      setPassword(savedPassword)
-    }
-  }, [])
-
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
     setError("")
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match")
+      return
+    }
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters")
+      return
+    }
+
     setLoading(true)
 
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+    const { data, error: signupError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || window.location.origin,
+      },
     })
 
-    if (loginError) {
-      setError(loginError.message)
+    if (signupError) {
+      setError(signupError.message)
       setLoading(false)
       return
     }
 
     if (data.user) {
-      if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email)
-        localStorage.setItem("rememberedPassword", password)
-      } else {
-        localStorage.removeItem("rememberedEmail")
-        localStorage.removeItem("rememberedPassword")
-      }
-
-      if (activeTab === "admin") {
-        window.location.href = "/admin"
-      } else {
-        window.location.href = "/client/dashboard"
-      }
-    } else {
-      setError("Login failed. Please try again.")
-      setLoading(false)
+      // Automatically confirm user (no email verification needed)
+      window.location.href = "/login?registered=true"
     }
   }
 
@@ -88,47 +74,17 @@ export default function UnifiedLoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
-          <div className="flex rounded-t-2xl overflow-hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("user")
-                setError("")
-              }}
-              className="w-1/2 text-center py-4 font-semibold transition-all duration-200 rounded-tl-2xl"
-              style={{
-                background: activeTab === "user" ? brandColor : "#F3F3F3",
-                color: activeTab === "user" ? "#000" : "#555",
-              }}
-            >
-              User Login
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("admin")
-                setError("")
-              }}
-              className="w-1/2 text-center py-4 font-semibold transition-all duration-200 rounded-tr-2xl"
-              style={{
-                background: activeTab === "admin" ? brandColor : "#F3F3F3",
-                color: activeTab === "admin" ? "#000" : "#555",
-              }}
-            >
-              Admin Login
-            </button>
+          <div
+            className="w-full text-center py-4 font-semibold rounded-t-2xl text-black"
+            style={{ backgroundColor: brandColor }}
+          >
+            Create Account
           </div>
 
           <div className="p-8">
-            {/* Dynamic Title */}
             <div className="text-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {activeTab === "user" ? "User Dashboard" : "Admin Portal"}
-              </h2>
-              <p className="text-gray-500 text-sm mt-1">
-                {activeTab === "user" ? "Sign in to access your dashboard" : "Sign in to manage operations"}
-              </p>
+              <h2 className="text-xl font-semibold text-gray-900">Sign Up</h2>
+              <p className="text-gray-500 text-sm mt-1">Create your account to get started</p>
             </div>
 
             {error && (
@@ -138,7 +94,7 @@ export default function UnifiedLoginPage() {
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleSignup} className="space-y-5">
               <div>
                 <Label htmlFor="email" className="text-gray-700">
                   Email Address
@@ -178,15 +134,28 @@ export default function UnifiedLoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                />
-                <label htmlFor="remember" className="text-sm text-gray-600 cursor-pointer select-none">
-                  Remember me
-                </label>
+              <div>
+                <Label htmlFor="confirmPassword" className="text-gray-700">
+                  Confirm Password
+                </Label>
+                <div className="relative mt-1.5">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    className="h-11 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
 
               <Button
@@ -198,15 +167,21 @@ export default function UnifiedLoginPage() {
                 {loading ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    Signing in...
+                    Creating Account...
                   </>
                 ) : (
-                  "Sign In"
+                  "Sign Up"
                 )}
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+            <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-3">
+              <p className="text-gray-600 text-sm">
+                Already have an account?{" "}
+                <Link href="/login" className="font-semibold text-gray-900 hover:text-gray-700">
+                  Sign In
+                </Link>
+              </p>
               <p className="text-gray-600 text-sm">
                 <Link href="/" className="text-gray-600 hover:text-gray-800 transition-colors">
                   ← Back to website

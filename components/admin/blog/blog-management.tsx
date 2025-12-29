@@ -1,8 +1,6 @@
 "use client"
 
 import type React from "react"
-import { toast } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
 
 import { useState, useEffect } from "react"
 import { createBrowserClient } from "@/lib/supabase/client"
@@ -70,26 +68,10 @@ export function BlogManagement() {
         formData.status === "scheduled" && formData.scheduled_at ? new Date(formData.scheduled_at).toISOString() : null,
     }
 
-    console.log("[v0] Submitting blog post:", formData.title)
-
     if (editingPost) {
-      const { error } = await supabase.from("blog_posts").update(data).eq("id", editingPost.id)
-      if (!error) {
-        toast.success("✓ Post updated successfully!")
-        console.log("[v0] Blog post updated")
-      } else {
-        console.error("[v0] Update error:", error)
-        toast.error(`Update failed: ${error.message}`)
-      }
+      await supabase.from("blog_posts").update(data).eq("id", editingPost.id)
     } else {
-      const { error } = await supabase.from("blog_posts").insert(data)
-      if (!error) {
-        toast.success("✓ New post created successfully!")
-        console.log("[v0] Blog post created")
-      } else {
-        console.error("[v0] Create error:", error)
-        toast.error(`Create failed: ${error.message}`)
-      }
+      await supabase.from("blog_posts").insert(data)
     }
 
     setShowDialog(false)
@@ -117,15 +99,8 @@ export function BlogManagement() {
 
   async function handleDelete(id: string) {
     if (confirm("Delete this post?")) {
-      const { error } = await supabase.from("blog_posts").delete().eq("id", id)
-      if (!error) {
-        toast.success("✓ Post deleted successfully!")
-        fetchData()
-        console.log("[v0] Blog post deleted")
-      } else {
-        console.error("[v0] Delete error:", error)
-        toast.error(`Delete failed: ${error.message}`)
-      }
+      await supabase.from("blog_posts").delete().eq("id", id)
+      fetchData()
     }
   }
 

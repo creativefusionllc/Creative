@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CaptchaInput } from "@/components/auth/captcha-input"
 import { toast } from "sonner"
 import Link from "next/link"
@@ -21,7 +20,6 @@ export default function RegisterPage() {
     company: "",
     phone: "",
     referralCode: "",
-    clientType: "client", // Added role/account type selection
   })
   const [captchaValue, setCaptchaValue] = useState("")
   const [captchaValid, setCaptchaValid] = useState(false)
@@ -34,10 +32,6 @@ export default function RegisterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleClientTypeChange = (value: string) => {
-    setFormData({ ...formData, clientType: value })
-  }
-
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault()
     setError("")
@@ -45,27 +39,6 @@ export default function RegisterPage() {
     if (!captchaValid) {
       setError("Please solve the security question correctly")
       toast.error("Please solve the security question correctly")
-      return
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(formData.email)) {
-      setError("Please enter a valid email address")
-      toast.error("Invalid email format")
-      return
-    }
-
-    if (!formData.phone) {
-      setError("Phone number is required")
-      toast.error("Phone number is required")
-      return
-    }
-
-    const phoneRegex = /^(\+971|0)?[0-9]{9}$/
-    const cleanPhone = formData.phone.replace(/\s|-/g, "")
-    if (!phoneRegex.test(cleanPhone)) {
-      setError("Please enter a valid UAE phone number (e.g., +971 50 000 0000 or 050 000 0000)")
-      toast.error("Invalid phone number format")
       return
     }
 
@@ -146,7 +119,7 @@ export default function RegisterPage() {
           name: formData.name,
           company: formData.company,
           phone: formData.phone,
-          role: formData.clientType, // Use selected role instead of hardcoded
+          role: "client",
         },
       },
     })
@@ -201,7 +174,6 @@ export default function RegisterPage() {
         account_status: "pending",
         verification_token: verificationToken,
         verification_sent_at: new Date().toISOString(),
-        client_type: formData.clientType, // Store the selected account type
       })
 
       if (referrer) {
@@ -226,7 +198,7 @@ export default function RegisterPage() {
           .then((r) => r.json())
           .then((d) => d.ip)
           .catch(() => "unknown"),
-        metadata: { email: formData.email, name: formData.name, clientType: formData.clientType },
+        metadata: { email: formData.email, name: formData.name },
       })
 
       setSuccess(true)
@@ -296,8 +268,8 @@ export default function RegisterPage() {
             <div className="w-14 h-14 bg-[#C4D600]/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="h-7 w-7 text-[#C4D600]" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">Create Account</h2>
-            <p className="text-gray-500 text-sm mt-1">Register to access our platform</p>
+            <h2 className="text-xl font-semibold text-gray-900">Create Client Account</h2>
+            <p className="text-gray-500 text-sm mt-1">Register to book services and manage projects</p>
           </div>
 
           {error && (
@@ -308,23 +280,6 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleRegister} className="space-y-4">
-            <div>
-              <Label htmlFor="clientType" className="text-gray-700">
-                Account Type *
-              </Label>
-              <Select value={formData.clientType} onValueChange={handleClientTypeChange}>
-                <SelectTrigger className="mt-1.5">
-                  <SelectValue placeholder="Select account type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="client">Client - Service Buyer</SelectItem>
-                  <SelectItem value="agent">Agent - Freelance Reseller</SelectItem>
-                  <SelectItem value="agency">Agency - Full Agency</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-gray-500 mt-1">Choose the account type that best fits your needs</p>
-            </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="name" className="text-gray-700">
@@ -343,7 +298,7 @@ export default function RegisterPage() {
               </div>
               <div>
                 <Label htmlFor="phone" className="text-gray-700">
-                  Phone *
+                  Phone
                 </Label>
                 <Input
                   id="phone"
@@ -352,7 +307,6 @@ export default function RegisterPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+971 50 000 0000"
-                  required
                   className="mt-1.5"
                 />
               </div>

@@ -21,82 +21,27 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
   const totalAmount = amount + processingFee + tax
 
   useEffect(() => {
-    if (!clientId) {
-      setError("PayPal configuration is missing. Please contact support.")
-      setLoading(false)
-      return
-    }
-
-    let isComponentMounted = true
-    let scriptTimeoutId: NodeJS.Timeout | undefined
-
     const loadPayPalScript = async () => {
       if ((window as any).paypal) {
-        if (isComponentMounted) renderPayPalButtons()
+        renderPayPalButtons()
         return
       }
 
       const script = document.createElement("script")
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=AED&disable-funding=credit,card`
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=AED`
       script.async = true
-
-      let loadAttempts = 0
-      const maxAttempts = 3
-
       script.onload = () => {
-        if ((window as any).paypal && isComponentMounted) {
-          renderPayPalButtons()
-        } else if (loadAttempts < maxAttempts && isComponentMounted) {
-          loadAttempts++
-          setTimeout(loadPayPalScript, 1000)
-        } else if (isComponentMounted) {
-          setError("PayPal failed to initialize. Please try refreshing the page.")
-          setLoading(false)
-          onError?.("PayPal initialization failed")
-        }
+        renderPayPalButtons()
       }
-
       script.onerror = () => {
-        if (!isComponentMounted) return
-        setError("Failed to load PayPal. Checking configuration and retrying...")
-
-        if (loadAttempts < maxAttempts) {
-          loadAttempts++
-          setTimeout(() => {
-            if (isComponentMounted) {
-              loadPayPalScript()
-            }
-          }, 2000)
-        } else if (isComponentMounted) {
-          setError(
-            `PayPal failed to load after ${maxAttempts} attempts. Please check your PayPal Client ID configuration or contact support.`,
-          )
-          setLoading(false)
-          onError?.("PayPal script failed to load")
-        }
+        setError("Failed to load PayPal. Please refresh and try again.")
+        setLoading(false)
       }
-
       document.head.appendChild(script)
-
-      scriptTimeoutId = setTimeout(() => {
-        if (isComponentMounted && loading && !error) {
-          setError("PayPal is taking too long to load. Please try refreshing the page.")
-          setLoading(false)
-          onError?.("PayPal loading timeout")
-        }
-      }, 15000)
     }
 
     const renderPayPalButtons = () => {
-      if (!isComponentMounted || !containerRef.current) return
-
-      if (!(window as any).paypal) {
-        if (isComponentMounted) {
-          setError("PayPal is not properly loaded. Please refresh the page.")
-          setLoading(false)
-        }
-        return
-      }
+      if (!containerRef.current || !(window as any).paypal) return
 
       const createOrder = async () => {
         try {
@@ -153,36 +98,25 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
         onError?.(errorMsg)
         setLoading(false)
       }
+      ;(window as any).paypal
+        .Buttons({
+          createOrder,
+          onApprove,
+          onError: onPayPalError,
+          style: {
+            layout: "vertical",
+            color: "blue",
+            shape: "rect",
+            label: "pay",
+          },
+        })
+        .render(containerRef.current)
 
-      try {
-        ;(window as any).paypal
-          .Buttons({
-            createOrder,
-            onApprove,
-            onError: onPayPalError,
-            style: {
-              layout: "vertical",
-              color: "blue",
-              shape: "rect",
-              label: "pay",
-            },
-          })
-          .render(containerRef.current)
-
-        setLoading(false)
-      } catch (err: any) {
-        setError("Failed to render PayPal buttons. Please try refreshing.")
-        setLoading(false)
-      }
+      setLoading(false)
     }
 
     loadPayPalScript()
-
-    return () => {
-      isComponentMounted = false
-      if (scriptTimeoutId) clearTimeout(scriptTimeoutId)
-    }
-  }, [clientId, totalAmount, onSuccess, onError])
+  }, [clientId, amount, totalAmount, onSuccess, onError])
 
   if (success) {
     return (
@@ -203,12 +137,7 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
           <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm text-red-700 font-medium">{error}</p>
-            <p className="text-xs text-red-600 mt-1">
-              If the problem persists, contact support at support@creativefusion.llc
-            </p>
-          </div>
+          <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
 

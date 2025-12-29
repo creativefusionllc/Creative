@@ -21,6 +21,8 @@ export default function ConfirmPage() {
       const tokenHash = searchParams.get("token_hash")
       const type = searchParams.get("type")
 
+      console.log("[v0] Verification attempt - token:", !!token, "email:", email, "tokenHash:", !!tokenHash)
+
       // Custom verification token from our system
       if (token && email) {
         try {
@@ -54,6 +56,7 @@ export default function ConfirmPage() {
             return
           }
 
+          console.log("[v0] Email verified successfully for:", email)
           setStatus("success")
           setMessage("Email verified successfully! Waiting for admin approval before you can login.")
         } catch (err) {
@@ -96,6 +99,7 @@ export default function ConfirmPage() {
             }
           }
 
+          console.log("[v0] Email verified via Supabase OTP")
           setStatus("success")
           setMessage("Email verified successfully! Waiting for admin approval before you can login.")
         } catch (err) {

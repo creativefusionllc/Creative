@@ -40,32 +40,8 @@ export function SystemSettings() {
     banner_text: "Download Creative Fusion App",
   })
 
-  const [cmsSettings, setCmsSettings] = useState({
-    defaultBudgetMinimum: "1000",
-    defaultBudgetMaximum: "50000",
-    defaultBookingAmount: "5000",
-    defaultTaxRate: "5",
-    pointsPerAED: "10",
-    walletTopupMinimum: "100",
-    bookingConfirmationFee: "0",
-    pointsRedemptionRate: "1",
-  })
-
-  const [serviceEstimates, setServiceEstimates] = useState<any[]>([
-    {
-      category: "branding",
-      subcategory: "logo-design",
-      estimatedPrice: "2500",
-      description: "Logo Design Service",
-      minBudget: "2000",
-      maxBudget: "5000",
-    },
-  ])
-
   useEffect(() => {
     fetchAppStoreConfig()
-    fetchCMSSettings()
-    fetchServiceEstimates()
   }, [])
 
   async function fetchAppStoreConfig() {
@@ -82,54 +58,12 @@ export function SystemSettings() {
     }
   }
 
-  async function fetchCMSSettings() {
-    try {
-      const response = await fetch("/api/admin/cms-settings")
-      if (response.ok) {
-        const data = await response.json()
-        if (data) setCmsSettings(data)
-      }
-    } catch (error) {
-      console.error("[v0] Failed to fetch CMS settings:", error)
-    }
-  }
-
-  async function fetchServiceEstimates() {
-    try {
-      const response = await fetch("/api/admin/service-estimates")
-      if (response.ok) {
-        const data = await response.json()
-        if (Array.isArray(data)) setServiceEstimates(data)
-      }
-    } catch (error) {
-      console.error("[v0] Failed to fetch service estimates:", error)
-    }
-  }
-
   async function handleSave() {
     setSaving(true)
     // Simulate save
     await new Promise((resolve) => setTimeout(resolve, 1000))
     setSaving(false)
     toast.success("Settings saved successfully")
-  }
-
-  async function handleSaveCMSSettings() {
-    setSaving(true)
-    try {
-      const response = await fetch("/api/admin/cms-settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cmsSettings),
-      })
-      if (response.ok) {
-        toast.success("CMS settings saved successfully")
-      }
-    } catch (error) {
-      toast.error("Failed to save CMS settings")
-      console.error("[v0] Error saving CMS settings:", error)
-    }
-    setSaving(false)
   }
 
   return (
@@ -170,18 +104,6 @@ export function SystemSettings() {
             className="text-gray-400 hover:text-[#C4D600] data-[state=active]:bg-[#C4D600] data-[state=active]:text-[#0a0a0a]"
           >
             Mobile Apps
-          </TabsTrigger>
-          <TabsTrigger
-            value="cms-budget"
-            className="text-gray-400 hover:text-[#C4D600] data-[state=active]:bg-[#C4D600] data-[state=active]:text-[#0a0a0a]"
-          >
-            CMS & Budget
-          </TabsTrigger>
-          <TabsTrigger
-            value="service-pricing"
-            className="text-gray-400 hover:text-[#C4D600] data-[state=active]:bg-[#C4D600] data-[state=active]:text-[#0a0a0a]"
-          >
-            Service Pricing
           </TabsTrigger>
         </TabsList>
 
@@ -519,205 +441,6 @@ export function SystemSettings() {
 
               <Button onClick={handleSave} disabled={saving} className="bg-[#C4D600] text-black hover:bg-[#d4e600]">
                 {saving ? "Saving..." : "Save App Store Configuration"}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="cms-budget">
-          <Card className="bg-[#141414] border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white">CMS Configuration</CardTitle>
-              <CardDescription className="text-gray-400">
-                Manage booking budget defaults and financial settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Default Budget Minimum (AED)</Label>
-                  <Input
-                    type="number"
-                    value={cmsSettings.defaultBudgetMinimum}
-                    onChange={(e) => setCmsSettings({ ...cmsSettings, defaultBudgetMinimum: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Default Budget Maximum (AED)</Label>
-                  <Input
-                    type="number"
-                    value={cmsSettings.defaultBudgetMaximum}
-                    onChange={(e) => setCmsSettings({ ...cmsSettings, defaultBudgetMaximum: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Default Booking Amount (AED)</Label>
-                  <Input
-                    type="number"
-                    value={cmsSettings.defaultBookingAmount}
-                    onChange={(e) => setCmsSettings({ ...cmsSettings, defaultBookingAmount: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Default Tax Rate (%)</Label>
-                  <Input
-                    type="number"
-                    step="0.1"
-                    value={cmsSettings.defaultTaxRate}
-                    onChange={(e) => setCmsSettings({ ...cmsSettings, defaultTaxRate: e.target.value })}
-                    className="bg-white/5 border-white/10"
-                  />
-                </div>
-              </div>
-
-              <div className="border-t border-white/10 pt-4">
-                <h4 className="font-semibold text-white mb-4">Points System</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Points Per AED Spent</Label>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      value={cmsSettings.pointsPerAED}
-                      onChange={(e) => setCmsSettings({ ...cmsSettings, pointsPerAED: e.target.value })}
-                      className="bg-white/5 border-white/10"
-                    />
-                    <p className="text-xs text-gray-400">Formula: Points = Amount / {cmsSettings.pointsPerAED}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-gray-300">Points Redemption Rate</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      value={cmsSettings.pointsRedemptionRate}
-                      onChange={(e) => setCmsSettings({ ...cmsSettings, pointsRedemptionRate: e.target.value })}
-                      className="bg-white/5 border-white/10"
-                    />
-                    <p className="text-xs text-gray-400">{cmsSettings.pointsRedemptionRate} Point = 1 AED</p>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                onClick={handleSaveCMSSettings}
-                disabled={saving}
-                className="bg-[#C4D600] text-black hover:bg-[#d4e600]"
-              >
-                {saving ? "Saving..." : "Save CMS Settings"}
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="service-pricing">
-          <Card className="bg-[#141414] border-white/10">
-            <CardHeader>
-              <CardTitle className="text-white">Service Estimated Pricing</CardTitle>
-              <CardDescription className="text-gray-400">
-                Set estimated prices for each service shown on inquiry forms
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {serviceEstimates.map((service, idx) => (
-                  <div key={idx} className="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <div className="grid grid-cols-2 gap-3 mb-3">
-                      <Input
-                        placeholder="Category (e.g., branding)"
-                        value={service.category}
-                        onChange={(e) => {
-                          const updated = [...serviceEstimates]
-                          updated[idx].category = e.target.value
-                          setServiceEstimates(updated)
-                        }}
-                        className="bg-white/5 border-white/10 text-sm"
-                      />
-                      <Input
-                        placeholder="Subcategory (e.g., logo-design)"
-                        value={service.subcategory}
-                        onChange={(e) => {
-                          const updated = [...serviceEstimates]
-                          updated[idx].subcategory = e.target.value
-                          setServiceEstimates(updated)
-                        }}
-                        className="bg-white/5 border-white/10 text-sm"
-                      />
-                    </div>
-                    <div className="grid grid-cols-3 gap-3 mb-3">
-                      <div>
-                        <Label className="text-xs text-gray-400">Estimated Price (AED)</Label>
-                        <Input
-                          type="number"
-                          value={service.estimatedPrice}
-                          onChange={(e) => {
-                            const updated = [...serviceEstimates]
-                            updated[idx].estimatedPrice = e.target.value
-                            setServiceEstimates(updated)
-                          }}
-                          className="bg-white/5 border-white/10 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-400">Min Budget (AED)</Label>
-                        <Input
-                          type="number"
-                          value={service.minBudget}
-                          onChange={(e) => {
-                            const updated = [...serviceEstimates]
-                            updated[idx].minBudget = e.target.value
-                            setServiceEstimates(updated)
-                          }}
-                          className="bg-white/5 border-white/10 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-gray-400">Max Budget (AED)</Label>
-                        <Input
-                          type="number"
-                          value={service.maxBudget}
-                          onChange={(e) => {
-                            const updated = [...serviceEstimates]
-                            updated[idx].maxBudget = e.target.value
-                            setServiceEstimates(updated)
-                          }}
-                          className="bg-white/5 border-white/10 text-sm"
-                        />
-                      </div>
-                    </div>
-                    <Input
-                      placeholder="Description"
-                      value={service.description}
-                      onChange={(e) => {
-                        const updated = [...serviceEstimates]
-                        updated[idx].description = e.target.value
-                        setServiceEstimates(updated)
-                      }}
-                      className="bg-white/5 border-white/10 text-sm mb-2"
-                    />
-                  </div>
-                ))}
-              </div>
-              <Button
-                onClick={() =>
-                  setServiceEstimates([
-                    ...serviceEstimates,
-                    {
-                      category: "",
-                      subcategory: "",
-                      estimatedPrice: "0",
-                      minBudget: "0",
-                      maxBudget: "0",
-                      description: "",
-                    },
-                  ])
-                }
-                variant="outline"
-                className="w-full border-white/20 text-[#C4D600] hover:bg-white/5"
-              >
-                + Add Service Estimate
               </Button>
             </CardContent>
           </Card>

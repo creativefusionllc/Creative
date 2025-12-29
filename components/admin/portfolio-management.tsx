@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Plus, Edit, Trash2, Loader2, Upload, X } from "lucide-react"
+import { Plus, Edit, Trash2, Loader2, Upload } from "lucide-react"
 
 export function PortfolioManagement() {
   const [portfolio, setPortfolio] = useState<any[]>([])
@@ -24,7 +24,6 @@ export function PortfolioManagement() {
     client_name: "",
     category: "Photography",
     featured_image: "",
-    gallery_images: [] as string[], // Added gallery_images array for multi-image support
     is_featured: false,
     status: "published" as "draft" | "published" | "archived",
   })
@@ -32,14 +31,18 @@ export function PortfolioManagement() {
   const supabase = createClient()
 
   const categories = [
-    "Photography",
-    "Product Shoot",
-    "Perfume",
     "Creative Branding",
+    "Photography",
     "Videography",
     "Digital Marketing",
+    "Marketing & PR",
     "Web Development",
+    "Software & Apps",
+    "Exhibition Stands",
+    "Print & Exhibitions",
+    "Gift Items",
     "Graphic Design",
+    "Social Media",
   ]
 
   useEffect(() => {
@@ -53,50 +56,31 @@ export function PortfolioManagement() {
     setLoading(false)
   }
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>, isGallery = false) {
-    const files = Array.from(e.currentTarget.files || [])
-    if (files.length === 0) return
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
 
     setUploading(true)
     try {
-      const uploadedUrls: string[] = []
+      const fileExt = file.name.split(".").pop()
+      const fileName = `${Math.random()}.${fileExt}`
+      const filePath = `${fileName}`
 
-      for (const file of files) {
-        const fileExt = file.name.split(".").pop()
-        const fileName = `${Math.random()}.${fileExt}`
-        const filePath = `${fileName}`
+      const { error: uploadError } = await supabase.storage.from("portfolio").upload(filePath, file)
 
-        const { error: uploadError } = await supabase.storage.from("portfolio").upload(filePath, file)
+      if (uploadError) throw uploadError
 
-        if (uploadError) throw uploadError
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("portfolio").getPublicUrl(filePath)
 
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("portfolio").getPublicUrl(filePath)
-        uploadedUrls.push(publicUrl)
-      }
-
-      if (isGallery) {
-        setFormData({
-          ...formData,
-          gallery_images: [...(formData.gallery_images || []), ...uploadedUrls],
-        })
-      } else {
-        setFormData({ ...formData, featured_image: uploadedUrls[0] })
-      }
+      setFormData({ ...formData, featured_image: publicUrl })
     } catch (error) {
-      alert("Error uploading images")
+      alert("Error uploading image")
       console.error(error)
     } finally {
       setUploading(false)
     }
-  }
-
-  function removeGalleryImage(index: number) {
-    setFormData({
-      ...formData,
-      gallery_images: formData.gallery_images.filter((_, i) => i !== index),
-    })
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -117,30 +101,18 @@ export function PortfolioManagement() {
       client_name: "",
       category: "Photography",
       featured_image: "",
-      gallery_images: [],
       is_featured: false,
       status: "published",
     })
     fetchPortfolio()
   }
 
-  async function handleDelete(id: string, imageUrl: string, galleryImages: string[]) {
+  async function handleDelete(id: string, imageUrl: string) {
     if (confirm("Are you sure you want to delete this portfolio item?")) {
-      // Delete featured image
       if (imageUrl && imageUrl.includes("supabase")) {
         const path = imageUrl.split("/portfolio/")[1]
         if (path) {
           await supabase.storage.from("portfolio").remove([path])
-        }
-      }
-
-      if (galleryImages && galleryImages.length > 0) {
-        const galleryPaths = galleryImages
-          .filter((url) => url.includes("supabase"))
-          .map((url) => url.split("/portfolio/")[1])
-          .filter(Boolean)
-        if (galleryPaths.length > 0) {
-          await supabase.storage.from("portfolio").remove(galleryPaths)
         }
       }
 
@@ -251,80 +223,30 @@ export function PortfolioManagement() {
             </div>
 
             <div>
-              <Label htmlFor="featured-image">Featured Image</Label>
-              <label className="flex-1">
-                <input
-                  id="featured-image"
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, false)}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full gap-2 bg-transparent"
-                  disabled={uploading}
-                  asChild
-                >
-                  <span>
-                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    {uploading ? "Uploading..." : "Upload Featured Image"}
-                  </span>
-                </Button>
-              </label>
+              <Label htmlFor="image">Featured Image</Label>
+              <div className="flex gap-2">
+                <label className="flex-1">
+                  <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full gap-2 bg-transparent"
+                    disabled={uploading}
+                    asChild
+                  >
+                    <span>
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploading ? "Uploading..." : "Upload Image"}
+                    </span>
+                  </Button>
+                </label>
+              </div>
               {formData.featured_image && (
                 <img
                   src={formData.featured_image || "/placeholder.svg"}
-                  alt="Featured preview"
+                  alt="Preview"
                   className="mt-2 h-32 w-auto object-cover rounded border"
                 />
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="gallery-images">Gallery Images (Multiple)</Label>
-              <label className="flex-1">
-                <input
-                  id="gallery-images"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, true)}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full gap-2 bg-transparent"
-                  disabled={uploading}
-                  asChild
-                >
-                  <span>
-                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    {uploading ? "Uploading..." : "Upload Gallery Images"}
-                  </span>
-                </Button>
-              </label>
-              {formData.gallery_images && formData.gallery_images.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {formData.gallery_images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={image || "/placeholder.svg"}
-                        alt={`Gallery ${index}`}
-                        className="w-full h-24 object-cover rounded border"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
               )}
             </div>
 
@@ -367,7 +289,6 @@ export function PortfolioManagement() {
                     client_name: "",
                     category: "Photography",
                     featured_image: "",
-                    gallery_images: [],
                     is_featured: false,
                     status: "published",
                   })
@@ -417,19 +338,12 @@ export function PortfolioManagement() {
                 </div>
                 <p className="text-sm text-[#C4D600] font-medium mb-1">{item.category}</p>
                 {item.client_name && <p className="text-sm text-gray-500 mb-2">Client: {item.client_name}</p>}
-                {item.gallery_images && item.gallery_images.length > 0 && (
-                  <p className="text-xs text-gray-400 mb-2">{item.gallery_images.length} gallery images</p>
-                )}
                 <p className="text-sm text-gray-600 line-clamp-2 mb-3">{item.description}</p>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => handleEdit(item)}>
                     <Edit className="h-4 w-4 mr-1" /> Edit
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDelete(item.id, item.featured_image, item.gallery_images || [])}
-                  >
+                  <Button size="sm" variant="destructive" onClick={() => handleDelete(item.id, item.featured_image)}>
                     <Trash2 className="h-4 w-4 mr-1" /> Delete
                   </Button>
                 </div>

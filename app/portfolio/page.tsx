@@ -1,7 +1,7 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { PortfolioHero } from "@/components/portfolio/portfolio-hero"
-import { PortfolioGallery } from "@/components/portfolio/portfolio-gallery"
+import { PortfolioGalleryDynamic } from "@/components/portfolio/portfolio-gallery-dynamic"
 import { CTASection } from "@/components/home/cta-section"
 import { generateSEOMetadata } from "@/lib/seo/metadata-generator"
 
@@ -34,7 +34,7 @@ export default function PortfolioPage() {
       <Header />
       <main>
         <PortfolioHero />
-        <PortfolioGallery />
+        <PortfolioGalleryDynamic />
         <CTASection />
       </main>
       <Footer />

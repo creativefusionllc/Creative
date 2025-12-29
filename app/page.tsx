@@ -12,6 +12,7 @@ import { PortfolioPreviewSection } from "@/components/home/portfolio-preview-sec
 import { LocationsStrip } from "@/components/home/locations-strip"
 import { TestimonialsSection } from "@/components/home/testimonials-section"
 import { PricingPackagesSection } from "@/components/home/pricing-packages-section"
+import { BlogSection } from "@/components/home/blog-section"
 import { WhatsAppButton } from "@/components/whatsapp-button"
 import { generateSEOMetadata } from "@/utils/seo-metadata"
 
@@ -84,6 +85,7 @@ export default function HomePage() {
         <LocationsStrip />
         <PricingPackagesSection />
         <TestimonialsSection />
+        <BlogSection />
         <BookingFormSection />
       </main>
       <Footer />

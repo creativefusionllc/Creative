@@ -11,8 +11,28 @@ CREATE TABLE IF NOT EXISTS blog_categories (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Script 005 already creates blog_posts with INSERT statements for sample data
--- Removed duplicate blog_posts table creation - using script 005 instead
+CREATE TABLE IF NOT EXISTS blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL,
+  featured_image TEXT,
+  category_id UUID REFERENCES blog_categories(id) ON DELETE SET NULL,
+  author_id UUID REFERENCES clients(id) ON DELETE SET NULL,
+  status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'scheduled', 'archived')),
+  is_featured BOOLEAN DEFAULT false,
+  view_count INTEGER DEFAULT 0,
+  read_time INTEGER DEFAULT 5,
+  tags TEXT[] DEFAULT '{}',
+  meta_title TEXT,
+  meta_description TEXT,
+  meta_keywords TEXT[],
+  published_at TIMESTAMP WITH TIME ZONE,
+  scheduled_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 CREATE TABLE IF NOT EXISTS blog_comments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

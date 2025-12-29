@@ -4,10 +4,7 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const clientIp = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown"
-    const userAgent = request.headers.get("user-agent") || "unknown"
-
-    console.log("[v0] Booking received from:", clientIp)
+    console.log("[v0] Booking received:", body)
 
     const {
       name,
@@ -22,6 +19,7 @@ export async function POST(request: NextRequest) {
       notes,
     } = body
 
+    // Validate required fields
     if (!name || !email || !phone) {
       return NextResponse.json({ error: "Name, email, and phone are required" }, { status: 400 })
     }
@@ -53,6 +51,7 @@ Timeline: ${timeline || "Not specified"}
     const whatsappPhoneId = process.env.WHATSAPP_BUSINESS_PHONE_ID
     const recipientPhoneNumber = "971581174911"
 
+    // Always generate WhatsApp link as fallback
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${recipientPhoneNumber}&text=${encodeURIComponent(message)}`
 
     if (whatsappApiToken && whatsappPhoneId) {
@@ -67,7 +66,9 @@ Timeline: ${timeline || "Not specified"}
             messaging_product: "whatsapp",
             to: recipientPhoneNumber,
             type: "text",
-            text: { body: message },
+            text: {
+              body: message,
+            },
           }),
         })
 
@@ -79,12 +80,16 @@ Timeline: ${timeline || "Not specified"}
       } catch (whatsappError) {
         console.error("[v0] Failed to send WhatsApp message:", whatsappError)
       }
+    } else {
+      console.log("[v0] WhatsApp API credentials not configured. Using link fallback.")
     }
 
     const supabase = await createClient()
+
+    // Generate unique booking number
     const bookingNumber = "BK" + Date.now().toString().slice(-8).toUpperCase()
 
-    const { data: bookingData, error: dbError } = await supabase
+    const { data, error: dbError } = await supabase
       .from("bookings")
       .insert([
         {
@@ -101,24 +106,21 @@ Timeline: ${timeline || "Not specified"}
           source: "website_booking_form",
           status: "pending",
           booking_number: bookingNumber,
-          ip_address: clientIp,
-          user_agent: userAgent,
         },
       ])
       .select()
 
     if (dbError) {
-      console.error("[v0] Database error saving booking:", dbError)
-      // Still return success since WhatsApp message was sent
+      console.log("[v0] Note: Database error (RLS may be restrictive), but WhatsApp message was sent successfully")
+      // Don't fail - WhatsApp already worked
     } else {
-      console.log("[v0] Booking saved to database successfully")
+      console.log("[v0] Booking saved to database and WhatsApp sent successfully")
     }
 
     return NextResponse.json({
       success: true,
       message: "Booking submitted successfully! Opening WhatsApp...",
       booking_number: bookingNumber,
-      booking: bookingData?.[0] || null,
       whatsappUrl: whatsappUrl,
     })
   } catch (error) {

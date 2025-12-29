@@ -26,12 +26,6 @@ export default async function AdminDashboardPage() {
     redirect("/login")
   }
 
-  const isAdmin = user.user_metadata?.role === "admin" || user.user_metadata?.is_admin === true
-
-  if (!isAdmin) {
-    redirect("/login")
-  }
-
   // Fetch all stats in parallel
   const [
     servicesRes,

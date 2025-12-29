@@ -96,11 +96,7 @@ export async function generateStaticParams() {
   return Object.keys(portfolioItems).map((slug) => ({ slug }))
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const item = portfolioItems[slug as keyof typeof portfolioItems]
 
@@ -116,11 +112,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function PortfolioItemPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function PortfolioItemPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const item = portfolioItems[slug as keyof typeof portfolioItems]
 
