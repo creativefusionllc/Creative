@@ -5,6 +5,8 @@ import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { Toaster } from "@/components/ui/sonner"
+import { FloatingWhatsAppButton } from "@/components/floating-whatsapp-button"
+import { PromoBottomBanner } from "@/components/promo-bottom-banner"
 import "./globals.css"
 
 const inter = Inter({
@@ -60,6 +62,9 @@ export const metadata: Metadata = {
     "corporate video production dubai",
     "ecommerce development dubai",
     "mobile app development uae",
+    "creative fusion solutions",
+    "business solutions dubai",
+    "digital solutions uae",
   ],
   authors: [{ name: "Creative Fusion LLC", url: "https://creativefusion.llc" }],
   creator: "Creative Fusion LLC",
@@ -333,6 +338,32 @@ export default function RootLayout({
             }),
           }}
         />
+
+        {/* Add breadcrumb schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "@id": "https://creativefusion.llc#breadcrumb",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://creativefusion.llc",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Our Solutions",
+                  item: "https://creativefusion.llc/services",
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className={`${inter.className} antialiased`}>
         <Script id="security-init" strategy="lazyOnload">
@@ -363,6 +394,8 @@ export default function RootLayout({
         </Script>
         {/* Download banner now in Header component */}
         <ScrollToTop />
+        <FloatingWhatsAppButton />
+        <PromoBottomBanner />
         <Toaster />
         {children}
         <Analytics />

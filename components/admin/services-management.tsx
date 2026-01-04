@@ -20,6 +20,7 @@ interface Service {
   features: string[]
   benefits: string[]
   subservices: string[]
+  subservice_prices: number[] // Added price array for each sub-service
   is_active: boolean
   display_order: number
 }
@@ -40,12 +41,14 @@ export function ServicesManagement() {
     features: [],
     benefits: [],
     subservices: [],
+    subservice_prices: [], // Initialize empty prices array
     is_active: true,
     display_order: 0,
   })
   const [featureInput, setFeatureInput] = useState("")
   const [benefitInput, setBenefitInput] = useState("")
   const [subserviceInput, setSubserviceInput] = useState("")
+  const [subservicePriceInput, setSubservicePriceInput] = useState("") // Added price input state
 
   const supabase = createClient()
 
@@ -180,12 +183,14 @@ export function ServicesManagement() {
       features: [],
       benefits: [],
       subservices: [],
+      subservice_prices: [], // Initialize empty prices array
       is_active: true,
       display_order: 0,
     })
     setFeatureInput("")
     setBenefitInput("")
     setSubserviceInput("")
+    setSubservicePriceInput("") // Reset price input state
     setEditingId(null)
     setShowAddForm(false)
   }
@@ -194,6 +199,26 @@ export function ServicesManagement() {
     setFormData(service)
     setEditingId(service.id)
     setShowAddForm(true)
+  }
+
+  function handleAddSubservice() {
+    if (subserviceInput.trim() && subservicePriceInput.trim()) {
+      setFormData({
+        ...formData,
+        subservices: [...(formData.subservices || []), subserviceInput.trim()],
+        subservice_prices: [...(formData.subservice_prices || []), Number.parseInt(subservicePriceInput.trim())],
+      })
+      setSubserviceInput("")
+      setSubservicePriceInput("")
+    }
+  }
+
+  function handleRemoveSubservice(index: number) {
+    setFormData({
+      ...formData,
+      subservices: formData.subservices?.filter((_, i) => i !== index) || [],
+      subservice_prices: formData.subservice_prices?.filter((_, i) => i !== index) || [],
+    })
   }
 
   const filteredServices =
@@ -361,27 +386,49 @@ export function ServicesManagement() {
                 }
               />
 
-              <ArrayFieldInput
-                label="Sub-Services"
-                items={formData.subservices || []}
-                input={subserviceInput}
-                setInput={setSubserviceInput}
-                onAdd={() => {
-                  if (subserviceInput.trim()) {
-                    setFormData({
-                      ...formData,
-                      subservices: [...(formData.subservices || []), subserviceInput.trim()],
-                    })
-                    setSubserviceInput("")
-                  }
-                }}
-                onRemove={(index) =>
-                  setFormData({
-                    ...formData,
-                    subservices: formData.subservices?.filter((_, i) => i !== index) || [],
-                  })
-                }
-              />
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Sub-Services</label>
+                <div className="flex gap-2 mb-2">
+                  <Input
+                    value={subserviceInput}
+                    onChange={(e) => setSubserviceInput(e.target.value)}
+                    placeholder="Add Sub-Service"
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        handleAddSubservice()
+                      }
+                    }}
+                  />
+                  <Input
+                    type="number"
+                    value={subservicePriceInput}
+                    onChange={(e) => setSubservicePriceInput(e.target.value)}
+                    placeholder="Price"
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault()
+                        handleAddSubservice()
+                      }
+                    }}
+                  />
+                  <Button type="button" onClick={handleAddSubservice}>
+                    Add
+                  </Button>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {(formData.subservices || []).map((subservice: string, index: number) => (
+                    <div key={index} className="flex items-center gap-2 bg-gray-50 p-2 rounded">
+                      <span className="flex-1 text-sm">
+                        {subservice} - ${formData.subservice_prices?.[index] || 0}
+                      </span>
+                      <Button type="button" size="sm" variant="ghost" onClick={() => handleRemoveSubservice(index)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center gap-4">
@@ -399,7 +446,12 @@ export function ServicesManagement() {
                 <Input
                   type="number"
                   value={formData.display_order}
-                  onChange={(e) => setFormData({ ...formData, display_order: Number.parseInt(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      display_order: Number.parseInt(e.target.value),
+                    })
+                  }
                 />
               </div>
             </div>
@@ -476,7 +528,7 @@ export function ServicesManagement() {
                       <ul className="text-sm space-y-1">
                         {service.subservices.slice(0, 3).map((s, i) => (
                           <li key={i} className="text-gray-600">
-                            • {s.split(" - ")[0]}
+                            • {s} - ${service.subservice_prices?.[i] || 0}
                           </li>
                         ))}
                         {service.subservices.length > 3 && (

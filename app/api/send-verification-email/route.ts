@@ -3,11 +3,11 @@ import type { Request } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const { email, name, verificationUrl } = await request.json()
+    const { email, name, verificationToken } = await request.json()
 
-    if (!email || !verificationUrl) {
-      console.error("[v0] Missing required fields: email or verificationUrl")
-      return NextResponse.json({ error: "Email and verification URL are required" }, { status: 400 })
+    if (!email || !verificationToken) {
+      console.error("[v0] Missing required fields: email or verificationToken")
+      return NextResponse.json({ error: "Email and verification token are required" }, { status: 400 })
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -25,6 +25,8 @@ export async function POST(request: Request) {
         { status: 500 },
       )
     }
+
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verify-email?token=${verificationToken}`
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -100,6 +102,13 @@ export async function POST(request: Request) {
     `
 
     console.log("[v0] Sending verification email to:", email)
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@resend.dev"
+    const verifiedTestEmail = "creativefusionpro.com@gmail.com"
+
+    // In development/testing, send to verified email instead to avoid Resend restrictions
+    const recipientEmail = process.env.NODE_ENV === "production" ? email : verifiedTestEmail
+
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -107,8 +116,8 @@ export async function POST(request: Request) {
         Authorization: `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "Creative Fusion <noreply@resend.dev>",
-        to: email,
+        from: fromEmail,
+        to: recipientEmail,
         subject: "Verify Your Creative Fusion Account",
         html: emailHtml,
       }),

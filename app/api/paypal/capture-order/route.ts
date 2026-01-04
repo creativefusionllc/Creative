@@ -38,30 +38,47 @@ export async function POST(request: Request) {
 
     console.log("[v0] PayPal order captured:", captureResult)
 
-    // Update wallet balance
-    const newBalance = Number.parseInt(captureResult.purchase_units[0].amount.value) || amount
+    const capturedAmount = Number.parseFloat(captureResult.purchase_units[0].amount.value) || amount
 
     const { data: currentClient } = await supabase.from("clients").select("wallet_balance").eq("id", clientId).single()
 
-    const updatedBalance = (currentClient?.wallet_balance || 0) + newBalance
+    if (!currentClient) {
+      return Response.json({ error: "Client not found" }, { status: 404 })
+    }
 
-    await supabase.from("clients").update({ wallet_balance: updatedBalance }).eq("id", clientId)
+    const currentBalance = typeof currentClient.wallet_balance === "number" ? currentClient.wallet_balance : 0
+    const updatedBalance = currentBalance + capturedAmount
+
+    const { error: updateError } = await supabase
+      .from("clients")
+      .update({ wallet_balance: updatedBalance })
+      .eq("id", clientId)
+
+    if (updateError) {
+      console.error("[v0] Failed to update wallet balance:", updateError)
+      throw new Error("Failed to update wallet balance")
+    }
 
     // Record transaction
-    await supabase.from("wallet_transactions").insert({
+    const { error: transactionError } = await supabase.from("wallet_transactions").insert({
       client_id: clientId,
       type: "credit",
-      amount: newBalance,
+      amount: capturedAmount,
       balance_after: updatedBalance,
       description: "Wallet top-up via PayPal",
       payment_method: "paypal",
       verification_status: "verified",
     })
 
+    if (transactionError) {
+      console.error("[v0] Failed to record transaction:", transactionError)
+      throw new Error("Payment captured but transaction record failed")
+    }
+
     return Response.json({
       success: true,
       message: "Payment captured successfully",
-      newBalance,
+      newBalance: updatedBalance,
     })
   } catch (error: any) {
     console.error("[v0] PayPal capture error:", error)

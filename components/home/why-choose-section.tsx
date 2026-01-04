@@ -42,7 +42,7 @@ export function WhyChooseSection() {
         <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           <div className="order-2 lg:order-1">
             <p className="text-[#C4D600] font-medium tracking-widest uppercase text-sm mb-3">Why Creative Fusion</p>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2">We Merge Art with Technology</h2>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-2">{"We Merge Art\n with Technology"}</h2>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#C4D600] mb-6">to Deliver Results</h2>
             <p className="text-white/70 text-sm lg:text-base leading-relaxed mb-8">
               Partnering to Achieve Creative & Business Goals

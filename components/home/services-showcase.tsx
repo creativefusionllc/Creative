@@ -116,16 +116,16 @@ export function ServicesShowcase() {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1C1C1C] leading-tight">
               End-to-End Creative
               <br />
-              <span className="text-gray-400">& Digital Solutions</span>
+              <span className="text-gray-400">& Our Solutions</span>
             </h2>
           </div>
-          <p className="text-gray-600 max-w-md lg:text-right">
-            From strategy to execution, we deliver comprehensive services that transform your business vision into
+          <p className="text-gray-600 max-w-md lg:text-left">
+            From strategy to execution, we deliver comprehensive solutions that transform your business vision into
             reality.
           </p>
         </div>
 
-        {/* Featured Services - Large Cards */}
+        {/* Featured Solutions - Large Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {featuredServices.map((service, index) => (
             <Link
@@ -163,7 +163,7 @@ export function ServicesShowcase() {
           ))}
         </div>
 
-        {/* Other Services - Compact Grid */}
+        {/* Other Solutions - Compact Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {otherServices.map((service) => (
             <Link
@@ -195,7 +195,7 @@ export function ServicesShowcase() {
             href="/services"
             className="inline-flex items-center gap-2 bg-[#C4D600] text-[#1C1C1C] px-8 py-4 rounded-full font-semibold hover:bg-[#d4e600] transition-colors"
           >
-            View All Services
+            View All Solutions
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

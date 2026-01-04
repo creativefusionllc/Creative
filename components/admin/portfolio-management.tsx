@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -9,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Plus, Edit, Trash2, Loader2, Upload } from "lucide-react"
+import { PortfolioImageManager } from "./portfolio-image-manager"
 
 export function PortfolioManagement() {
   const [portfolio, setPortfolio] = useState<any[]>([])
@@ -24,6 +24,7 @@ export function PortfolioManagement() {
     client_name: "",
     category: "Photography",
     featured_image: "",
+    gallery_images: [],
     is_featured: false,
     status: "published" as "draft" | "published" | "archived",
   })
@@ -101,6 +102,7 @@ export function PortfolioManagement() {
       client_name: "",
       category: "Photography",
       featured_image: "",
+      gallery_images: [],
       is_featured: false,
       status: "published",
     })
@@ -250,6 +252,15 @@ export function PortfolioManagement() {
               )}
             </div>
 
+            <div>
+              <Label>Project Gallery</Label>
+              <PortfolioImageManager
+                portfolioId={editingId || "new"}
+                currentImages={formData.gallery_images || []}
+                onImagesUpdate={(images) => setFormData({ ...formData, gallery_images: images })}
+              />
+            </div>
+
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2">
                 <input
@@ -289,6 +300,7 @@ export function PortfolioManagement() {
                     client_name: "",
                     category: "Photography",
                     featured_image: "",
+                    gallery_images: [],
                     is_featured: false,
                     status: "published",
                   })

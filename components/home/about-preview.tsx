@@ -49,8 +49,7 @@ export function AboutPreview() {
                 <span className="text-[#C4D600]">Meets Strategy</span>
               </h2>
               <p className="text-gray-400 text-lg leading-relaxed">
-                Founded in 2009 and headquartered in Sharjah Media City (SHAMS), Creative Fusion LLC has evolved into
-                one of UAE's most trusted full-service creative agencies.
+                Founded in 2009 and headquartered in Sharjah Media City (SHAMS), Creative Fusion LLC has evolved into one of UAE's most trusted full-service creative agencies.
               </p>
             </div>
 

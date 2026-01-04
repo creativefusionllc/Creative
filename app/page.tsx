@@ -8,13 +8,35 @@ import { ServicesShowcase } from "@/components/home/services-showcase"
 import { WhyChooseSection } from "@/components/home/why-choose-section"
 import { ProcessSection } from "@/components/home/process-section"
 import { AboutPreview } from "@/components/home/about-preview"
-import { PortfolioPreviewSection } from "@/components/home/portfolio-preview-section"
 import { LocationsStrip } from "@/components/home/locations-strip"
-import { TestimonialsSection } from "@/components/home/testimonials-section"
-import { PricingPackagesSection } from "@/components/home/pricing-packages-section"
-import { BlogSection } from "@/components/home/blog-section"
-import { WhatsAppButton } from "@/components/whatsapp-button"
+import { PricingPackagesSection } from "@/components/home/pricing-packages-section" // Import PricingPackagesSection
+import dynamic from "next/dynamic"
+import { Suspense } from "react"
 import { generateSEOMetadata } from "@/utils/seo-metadata"
+
+const PortfolioPreviewSection = dynamic(
+  () => import("@/components/home/portfolio-preview-section").then((mod) => ({ default: mod.PortfolioPreviewSection })),
+  {
+    loading: () => <div className="h-96 bg-background" />,
+    ssr: true,
+  },
+)
+
+const TestimonialsSection = dynamic(
+  () => import("@/components/home/testimonials-section").then((mod) => ({ default: mod.TestimonialsSection })),
+  {
+    loading: () => <div className="h-96 bg-background" />,
+    ssr: true,
+  },
+)
+
+const BlogSection = dynamic(
+  () => import("@/components/home/blog-section").then((mod) => ({ default: mod.BlogSection })),
+  {
+    loading: () => <div className="h-96 bg-background" />,
+    ssr: true,
+  },
+)
 
 export const metadata = generateSEOMetadata({
   title: "Creative Fusion | Creative Fusion LLC - #1 Branding & Digital Marketing Agency Dubai UAE",
@@ -81,15 +103,20 @@ export default function HomePage() {
         <WhyChooseSection />
         <ProcessSection />
         <AboutPreview />
-        <PortfolioPreviewSection />
+        <Suspense fallback={<div className="h-96 bg-background" />}>
+          <PortfolioPreviewSection />
+        </Suspense>
         <LocationsStrip />
-        <PricingPackagesSection />
-        <TestimonialsSection />
-        <BlogSection />
+        <PricingPackagesSection /> // Insert PricingPackagesSection here
+        <Suspense fallback={<div className="h-96 bg-background" />}>
+          <TestimonialsSection />
+        </Suspense>
+        <Suspense fallback={<div className="h-96 bg-background" />}>
+          <BlogSection />
+        </Suspense>
         <BookingFormSection />
       </main>
       <Footer />
-      <WhatsAppButton />
     </>
   )
 }

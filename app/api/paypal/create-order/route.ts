@@ -33,11 +33,11 @@ export async function POST(request: Request) {
       return Response.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const orderId = await createPayPalOrder(amount, clientId)
+    const orderData = await createPayPalOrder(amount, clientId)
 
-    console.log("[v0] PayPal order created:", orderId)
+    console.log("[v0] PayPal order created:", orderData.id)
 
-    return Response.json({ orderId })
+    return Response.json({ orderId: orderData.id })
   } catch (error: any) {
     console.error("[v0] PayPal order creation error:", error)
     return Response.json({ error: error.message || "Failed to create PayPal order" }, { status: 500 })

@@ -6,6 +6,7 @@ import Image from "next/image"
 import { Menu, X, Phone, Mail, ChevronDown, Sparkles, Smartphone, Apple } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import AdvancedBookingForm from "@/components/advanced-booking-form"
+import InquiryForm from "@/components/inquiry-form"
 
 const serviceLinks = [
   { href: "/services/creative-branding", label: "Creative Branding" },
@@ -26,7 +27,7 @@ const serviceLinks = [
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/services", label: "Services", hasDropdown: true },
+  { href: "/services", label: "Our Solutions", hasDropdown: true },
   { href: "/portfolio", label: "Portfolio" },
   { href: "/about", label: "About" },
   { href: "/blog", label: "Blog" },
@@ -48,6 +49,7 @@ export function Header() {
   const [servicesOpen, setServicesOpen] = useState(false)
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
   const [bookingModalOpen, setBookingModalOpen] = useState(false)
+  const [inquiryModalOpen, setInquiryModalOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -118,6 +120,15 @@ export function Header() {
             </div>
             <div className="h-4 w-px bg-[#C4D600]/30" />
             <Link
+              href="/admin/login"
+              className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-2.5 py-1.5 rounded-lg transition-all hover:shadow-lg font-medium text-xs"
+              title="Admin Panel Access"
+            >
+              Admin
+              <ChevronDown className="h-3 w-3" />
+            </Link>
+            <div className="h-4 w-px bg-[#C4D600]/30" />
+            <Link
               href="/login"
               className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-2.5 py-1.5 rounded-lg transition-all hover:shadow-lg font-medium text-xs"
             >
@@ -183,7 +194,7 @@ export function Header() {
                               href="/services"
                               className="block px-4 py-2 text-sm font-medium text-[#C4D600] hover:bg-[#C4D600]/10 transition-colors"
                             >
-                              View All Services →
+                              View All Solutions →
                             </Link>
                           </div>
                         </div>
@@ -207,7 +218,7 @@ export function Header() {
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-[#C4D600] to-[#a8b800] text-gray-900 hover:from-[#b0c200] hover:to-[#95a200] font-semibold px-6 xl:px-8 h-10 xl:h-11 shadow-lg shadow-[#C4D600]/20"
-                onClick={() => setBookingModalOpen(true)}
+                onClick={() => setInquiryModalOpen(true)}
               >
                 Inquiry Now
               </Button>
@@ -252,7 +263,7 @@ export function Header() {
                             className="block text-sm font-medium text-[#C4D600] py-1.5"
                             onClick={() => setIsOpen(false)}
                           >
-                            View All Services →
+                            View All Solutions →
                           </Link>
                         </div>
                       )}
@@ -268,6 +279,13 @@ export function Header() {
                     </Link>
                   ),
                 )}
+                <Link
+                  href="/admin/login"
+                  className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-3 py-1.5 rounded-lg transition-all font-medium text-xs flex-1"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Admin
+                </Link>
                 <Link
                   href="/login"
                   className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-3 py-1.5 rounded-lg transition-all font-medium text-xs flex-1"
@@ -300,11 +318,11 @@ export function Header() {
                   size="sm"
                   className="w-fit bg-gradient-to-r from-[#C4D600] to-[#a8b800] text-gray-900 hover:from-[#b0c200] hover:to-[#95a200] font-semibold mt-2"
                   onClick={() => {
-                    setBookingModalOpen(true)
+                    setInquiryModalOpen(true)
                     setIsOpen(false)
                   }}
                 >
-                  Book Now
+                  Inquiry Now
                 </Button>
               </nav>
             </div>
@@ -319,6 +337,14 @@ export function Header() {
             <div className="p-8">
               <AdvancedBookingForm onClose={() => setBookingModalOpen(false)} isModal={true} />
             </div>
+          </div>
+        </div>
+      )}
+
+      {inquiryModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full my-8">
+            <InquiryForm onClose={() => setInquiryModalOpen(false)} isModal={true} />
           </div>
         </div>
       )}

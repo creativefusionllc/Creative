@@ -35,3 +35,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/admin/
+/app/api/ai/
+/app/api/sms/
+/public/uploads/

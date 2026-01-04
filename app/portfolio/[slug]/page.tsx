@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { PortfolioGalleryViewer } from "@/components/portfolio/portfolio-gallery-viewer"
 import { ArrowLeft, Calendar, Tag } from "lucide-react"
 
 const portfolioItems = {
@@ -23,6 +24,7 @@ const portfolioItems = {
       "Successfully raised Series A funding",
     ],
     image: "/modern-tech-startup-brand-identity-logo-design.jpg",
+    gallery_images: [],
   },
   "ecommerce-platform-development": {
     title: "E-commerce Platform Development",
@@ -36,6 +38,7 @@ const portfolioItems = {
       "Developed a headless e-commerce platform with Stripe integration, inventory management, and real-time analytics.",
     results: ["300% increase in online sales", "99.9% uptime", "Average page load under 2 seconds"],
     image: "/modern-ecommerce-website-design-shopping-platform.jpg",
+    gallery_images: [],
   },
   "product-photography-campaign": {
     title: "Product Photography Campaign",
@@ -51,6 +54,7 @@ const portfolioItems = {
       "Instagram engagement up 200%",
     ],
     image: "/luxury-jewelry-product-photography-studio-lighting.jpg",
+    gallery_images: [],
   },
   "social-media-marketing-campaign": {
     title: "Social Media Marketing Campaign",
@@ -67,6 +71,7 @@ const portfolioItems = {
       "85% increase in direct bookings from social media",
     ],
     image: "/luxury-hotel-social-media-marketing-content-instag.jpg",
+    gallery_images: [],
   },
   "corporate-video-production": {
     title: "Corporate Video Production",
@@ -78,6 +83,7 @@ const portfolioItems = {
     solution: "Produced a 3-minute cinematic corporate video with drone footage, interviews, and dynamic editing.",
     results: ["Featured on company homepage", "Shared by 50+ partners", "30% increase in job applications"],
     image: "/corporate-video-production-office-business-profess.jpg",
+    gallery_images: [],
   },
   "mobile-app-ui-ux-design": {
     title: "Mobile App UI/UX Design",
@@ -89,6 +95,7 @@ const portfolioItems = {
       "Created user-centered design with clear information architecture, intuitive navigation, and delightful micro-interactions.",
     results: ["4.8 star rating on app stores", "40% increase in daily active users", "Featured by Apple"],
     image: "/mobile-app-ui-ux-design-fintech-banking-interface.jpg",
+    gallery_images: [],
   },
 }
 
@@ -154,6 +161,13 @@ export default async function PortfolioItemPage({ params }: { params: Promise<{ 
               className="w-full rounded-lg shadow-lg"
             />
           </div>
+
+          {item.gallery_images && item.gallery_images.length > 0 && (
+            <div className="mb-12">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Project Gallery</h2>
+              <PortfolioGalleryViewer images={item.gallery_images} title={item.title} />
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-12 mb-12">
             <div>

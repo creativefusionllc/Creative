@@ -28,6 +28,7 @@ const navItems = [
   { href: "/client/points", label: "Points & Rewards", icon: Gift },
   { href: "/client/invoices", label: "Invoices", icon: FileText },
   { href: "/client/social-media", label: "Social Media", icon: Share2 },
+  { href: "/client/banners", label: "My Banners", icon: Plus }, // New banners menu item
 ]
 
 export function ClientLayout({ children, user, walletBalance = 0, pointsBalance = 0 }: ClientLayoutProps) {

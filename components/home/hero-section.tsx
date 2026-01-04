@@ -67,7 +67,7 @@ const socialLinks = [
     color: "#FF0000",
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93-.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
       </svg>
     ),
   },
@@ -300,7 +300,7 @@ export function HeroSection() {
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className={`bg-gradient-to-br ${index === 0 ? "from-[#C4D600]/20 to-[#C4D600]/5 border-[#C4D600]/30" : "from-white/10 to-white/5 border-white/10"} backdrop-blur-xl border rounded-2xl p-5 relative overflow-hidden transition-all hover:scale-[1.02]`}
+                className={`bg-gradient-to-br ${index === 0 ? "from-[#C4D600]/20 to-[#C4D600]/5 border-[#C4D600]" : "from-white/10 to-white/5 border-[#C4D600]/50"} backdrop-blur-xl border rounded-2xl p-5 relative overflow-hidden transition-all hover:scale-[1.02]`}
               >
                 <Quote
                   className={`w-8 h-8 ${index === 0 ? "text-[#C4D600]/30" : "text-white/10"} absolute top-4 right-4`}
@@ -357,26 +357,23 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col gap-4">
+      {/* Social Media Links - Left Side */}
+      <div className="absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col gap-3.5">
         {socialLinks.map((social) => (
           <a
             key={social.name}
             href={social.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-white/30"
-            style={{ ["--brand-color" as string]: social.color }}
+            className="group relative w-[46px] h-[46px] rounded-full bg-[#1e1e1e] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:bg-[#C4D600] hover:shadow-[0_8px_18px_rgba(196,214,0,0.35)]"
             aria-label={social.name}
           >
-            <span className="text-white/60 transition-colors duration-300 group-hover:text-[var(--brand-color)]">
-              {social.icon}
-            </span>
-            <span className="absolute left-full ml-3 px-2 py-1 bg-white/10 backdrop-blur-sm rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="text-white transition-colors duration-300 text-lg">{social.icon}</span>
+            <span className="absolute left-full ml-3 px-2 py-1 bg-[#1e1e1e] backdrop-blur-sm rounded text-xs text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
               {social.name}
             </span>
           </a>
         ))}
-        <div className="w-px h-16 bg-gradient-to-b from-white/20 to-transparent mx-auto mt-2" />
       </div>
 
       {/* Main Content */}

@@ -28,7 +28,7 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
       }
 
       const script = document.createElement("script")
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=AED`
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=AED&intent=capture`
       script.async = true
       script.onload = () => {
         renderPayPalButtons()
@@ -45,6 +45,7 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
 
       const createOrder = async () => {
         try {
+          console.log("[v0] Creating PayPal order with amount:", totalAmount)
           const response = await fetch("/api/paypal/create-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -53,18 +54,22 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
 
           if (!response.ok) {
             const error = await response.json()
+            console.error("[v0] Create order failed:", error)
             throw new Error(error.error || "Failed to create PayPal order")
           }
 
           const { orderId } = await response.json()
+          console.log("[v0] Order created successfully:", orderId)
           return orderId
         } catch (err: any) {
+          console.error("[v0] Order creation error:", err)
           throw new Error(err.message || "Failed to create order")
         }
       }
 
       const onApprove = async (data: any) => {
         try {
+          console.log("[v0] PayPal approved, capturing order:", data.orderID)
           setLoading(true)
           const response = await fetch("/api/paypal/capture-order", {
             method: "POST",
@@ -78,13 +83,17 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
 
           if (!response.ok) {
             const error = await response.json()
+            console.error("[v0] Capture failed:", error)
             throw new Error(error.error || "Payment capture failed")
           }
 
+          const result = await response.json()
+          console.log("[v0] Payment captured successfully:", result)
           setSuccess(true)
           onSuccess?.()
         } catch (err: any) {
           const errorMsg = err.message || "Payment capture failed"
+          console.error("[v0] Capture error:", errorMsg)
           setError(errorMsg)
           onError?.(errorMsg)
         } finally {
@@ -94,6 +103,7 @@ export function PayPalPaymentForm({ clientId, amount, onSuccess, onError }: PayP
 
       const onPayPalError = (err: any) => {
         const errorMsg = err.message || "PayPal error occurred"
+        console.error("[v0] PayPal error:", errorMsg)
         setError(errorMsg)
         onError?.(errorMsg)
         setLoading(false)

@@ -24,6 +24,9 @@ export function generateSEOMetadata({
   const baseUrl = "https://creativefusion.llc"
   const fullUrl = `${baseUrl}${path}`
 
+  const trimmedTitle = title.length > 55 ? title.substring(0, 55).trim() + "..." : title
+  const trimmedDescription = description.length > 155 ? description.substring(0, 155).trim() + "..." : description
+
   // Add Dubai/UAE/GCC keywords to all pages
   const enhancedKeywords = [
     ...keywords,
@@ -37,8 +40,8 @@ export function generateSEOMetadata({
   ]
 
   return {
-    title,
-    description,
+    title: trimmedTitle,
+    description: trimmedDescription,
     keywords: enhancedKeywords,
     authors: [{ name: "Creative Fusion LLC", url: baseUrl }],
     creator: "Creative Fusion LLC",
@@ -61,8 +64,8 @@ export function generateSEOMetadata({
       locale: "en_AE",
       url: fullUrl,
       siteName: "Creative Fusion LLC",
-      title: `${title} | Creative Fusion LLC`,
-      description,
+      title: `${trimmedTitle} | Creative Fusion LLC`.substring(0, 65),
+      description: trimmedDescription,
       images: [
         {
           url: image,
@@ -77,17 +80,17 @@ export function generateSEOMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: `${title} | Creative Fusion LLC`,
-      description,
+      title: `${trimmedTitle} | Creative Fusion LLC`,
+      description: trimmedDescription,
       images: [image],
       creator: "@creativefusionllc",
       site: "@creativefusionllc",
     },
     alternates: {
-      canonical: fullUrl,
+      canonical: fullUrl.replace("https://creativefusion.llc", "https://www.creativefusion.llc"),
       languages: {
-        "en-AE": fullUrl,
-        "en-US": fullUrl,
+        "en-AE": fullUrl.replace("https://creativefusion.llc", "https://www.creativefusion.llc"),
+        "en-US": fullUrl.replace("https://creativefusion.llc", "https://www.creativefusion.llc"),
       },
     },
     category: "business",

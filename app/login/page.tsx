@@ -15,7 +15,6 @@ export default function UnifiedLoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<"user" | "admin">("user")
   const [rememberMe, setRememberMe] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const supabase = createClient()
@@ -60,11 +59,7 @@ export default function UnifiedLoginPage() {
         localStorage.removeItem("rememberedPassword")
       }
 
-      if (activeTab === "admin") {
-        window.location.href = "/admin"
-      } else {
-        window.location.href = "/client/dashboard"
-      }
+      window.location.href = "/client/dashboard"
     } else {
       setError("Login failed. Please try again.")
       setLoading(false)
@@ -74,7 +69,6 @@ export default function UnifiedLoginPage() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        {/* Logo/Brand */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <div
@@ -88,47 +82,17 @@ export default function UnifiedLoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
-          <div className="flex rounded-t-2xl overflow-hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("user")
-                setError("")
-              }}
-              className="w-1/2 text-center py-4 font-semibold transition-all duration-200 rounded-tl-2xl"
-              style={{
-                background: activeTab === "user" ? brandColor : "#F3F3F3",
-                color: activeTab === "user" ? "#000" : "#555",
-              }}
-            >
-              User Login
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("admin")
-                setError("")
-              }}
-              className="w-1/2 text-center py-4 font-semibold transition-all duration-200 rounded-tr-2xl"
-              style={{
-                background: activeTab === "admin" ? brandColor : "#F3F3F3",
-                color: activeTab === "admin" ? "#000" : "#555",
-              }}
-            >
-              Admin Login
-            </button>
+          <div
+            className="w-full text-center py-4 font-semibold rounded-t-2xl text-black"
+            style={{ backgroundColor: brandColor }}
+          >
+            Client Login
           </div>
 
           <div className="p-8">
-            {/* Dynamic Title */}
             <div className="text-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {activeTab === "user" ? "User Dashboard" : "Admin Portal"}
-              </h2>
-              <p className="text-gray-500 text-sm mt-1">
-                {activeTab === "user" ? "Sign in to access your dashboard" : "Sign in to manage operations"}
-              </p>
+              <h2 className="text-xl font-semibold text-gray-900">Welcome Back</h2>
+              <p className="text-gray-500 text-sm mt-1">Sign in to access your dashboard</p>
             </div>
 
             {error && (
@@ -206,7 +170,13 @@ export default function UnifiedLoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+            <div className="mt-6 pt-6 border-t border-gray-100 text-center space-y-3">
+              <p className="text-gray-600 text-sm">
+                Don't have an account?{" "}
+                <Link href="/signup" className="font-semibold text-gray-900 hover:text-gray-700">
+                  Sign Up
+                </Link>
+              </p>
               <p className="text-gray-600 text-sm">
                 <Link href="/" className="text-gray-600 hover:text-gray-800 transition-colors">
                   ← Back to website

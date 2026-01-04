@@ -64,11 +64,12 @@ export async function createPayPalOrder(amount: number, clientId: string) {
 
   if (!response.ok) {
     const error = await response.json()
-    throw new Error(`PayPal order creation failed: ${error.message}`)
+    console.error("[v0] PayPal API error:", error)
+    throw new Error(`PayPal order creation failed: ${error.details?.[0]?.issue || error.message || "Unknown error"}`)
   }
 
   const data = await response.json()
-  return data
+  return { id: data.id, status: data.status }
 }
 
 export async function capturePayPalOrder(orderId: string) {
@@ -85,9 +86,50 @@ export async function capturePayPalOrder(orderId: string) {
 
   if (!response.ok) {
     const error = await response.json()
-    throw new Error(`PayPal capture failed: ${error.message}`)
+    console.error("[v0] PayPal capture API error:", error)
+    throw new Error(`PayPal capture failed: ${error.details?.[0]?.issue || error.message || "Unknown error"}`)
   }
 
   const data = await response.json()
+  if (data.status !== "COMPLETED") {
+    throw new Error(`Payment not completed. Status: ${data.status}`)
+  }
   return data
+}
+
+export async function verifyPayPalWebhook(event: any): Promise<boolean> {
+  try {
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
+    const secretKey = process.env.PAYPAL_SECRET_KEY
+
+    if (!clientId || !secretKey) {
+      return false
+    }
+
+    const token = await getPayPalAccessToken()
+    const apiBase = process.env.PAYPAL_MODE === "live" ? "https://api.paypal.com" : "https://api.sandbox.paypal.com"
+
+    const response = await fetch(`${apiBase}/v1/notifications/verify-webhook-signature`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        transmission_id: event.transmission_id,
+        transmission_time: event.transmission_time,
+        cert_url: event.cert_url,
+        auth_algo: event.auth_algo,
+        transmission_sig: event.transmission_sig,
+        webhook_id: process.env.PAYPAL_WEBHOOK_ID,
+        webhook_event: event.webhook_event,
+      }),
+    })
+
+    const data = await response.json()
+    return data.verification_status === "SUCCESS"
+  } catch (error) {
+    console.error("[v0] Webhook verification error:", error)
+    return false
+  }
 }

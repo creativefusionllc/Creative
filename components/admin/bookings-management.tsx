@@ -65,6 +65,9 @@ export function BookingsManagement() {
 
   const supabase = createClient()
 
+  // Create a map for clients for quick lookup
+  const clientsMap = new Map(clients.map((client) => [client.id, client]))
+
   useEffect(() => {
     fetchBookings()
     fetchClients() // Added from updates
@@ -641,7 +644,7 @@ export function BookingsManagement() {
   }
 
   // Updated filteredBookings logic from updates
-  const filteredBookings = bookings.filter((booking) => {
+  const filteredAndSearchedBookings = bookings.filter((booking) => {
     const matchesSearch =
       booking.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       booking.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -672,17 +675,17 @@ export function BookingsManagement() {
 
   // Updated statusColors from updates
   const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
-    confirmed: "bg-green-100 text-green-800 border-green-300",
-    cancelled: "bg-red-100 text-red-800 border-red-300",
-    pending_cancellation: "bg-orange-100 text-orange-800 border-orange-300",
-    pending_reschedule: "bg-purple-100 text-purple-800 border-purple-300",
+    pending: "bg-yellow-500 text-white", // Updated for contrast
+    confirmed: "bg-green-500 text-white", // Updated for contrast
+    cancelled: "bg-red-500 text-white", // Updated for contrast
+    pending_cancellation: "bg-orange-500 text-white", // Updated for contrast
+    pending_reschedule: "bg-purple-500 text-white", // Updated for contrast
   }
 
   const projectStatusColors: Record<string, string> = {
-    upcoming: "bg-blue-100 text-blue-800 border-blue-300",
-    in_progress: "bg-indigo-100 text-indigo-800 border-indigo-300",
-    completed: "bg-gray-100 text-gray-800 border-gray-300",
+    upcoming: "bg-blue-500 text-white", // Updated for contrast
+    in_progress: "bg-indigo-500 text-white", // Updated for contrast
+    completed: "bg-gray-500 text-white", // Updated for contrast
   }
 
   // Added from updates: serviceCategories and subcategories
@@ -742,24 +745,23 @@ export function BookingsManagement() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header (Updated from updates) */}
+    <div className="space-y-6 bg-gray-900 min-h-screen p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Bookings Management</h2>
-          <p className="text-gray-600">
-            Agency: <span className="font-mono font-semibold">{agencyNumber}</span>
+          <h2 className="text-3xl font-bold text-white">Bookings Management</h2>
+          <p className="text-gray-300 mt-2">
+            Agency: <span className="font-mono font-semibold text-[#C4D600]">{agencyNumber}</span>
           </p>
         </div>
         {/* Changed to DialogTrigger as per updates */}
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-[#bbcb00] hover:bg-[#a8b800] text-black">
+            <Button className="bg-[#C4D600] hover:bg-[#b8c200] text-black font-semibold">
               <Plus className="h-4 w-4 mr-2" />
               Add Booking
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white border-gray-700">
             <DialogHeader>
               <DialogTitle>Add New Booking</DialogTitle>
             </DialogHeader>
@@ -767,14 +769,14 @@ export function BookingsManagement() {
             <form onSubmit={handleAddBooking} className="space-y-4">
               {/* Select existing client (Updated from updates) */}
               <div>
-                <Label>Select Existing Client (Optional)</Label>
+                <Label className="text-gray-300">Select Existing Client (Optional)</Label>
                 <Select onValueChange={handleClientSelect}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                     <SelectValue placeholder="Choose a client or enter manually" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-700 text-white border-gray-600">
                     {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.user_id || client.id}>
+                      <SelectItem key={client.id} value={client.user_id || client.id} className="hover:bg-gray-600">
                         {client.client_number} - {client.name} ({client.email})
                       </SelectItem>
                     ))}
@@ -784,62 +786,74 @@ export function BookingsManagement() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Name *</Label>
+                  <Label htmlFor="name" className="text-gray-300">
+                    Name *
+                  </Label>
                   <Input
                     id="name"
                     value={newBooking.name}
                     onChange={(e) => setNewBooking({ ...newBooking, name: e.target.value })}
                     required
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email" className="text-gray-300">
+                    Email *
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     value={newBooking.email}
                     onChange={(e) => setNewBooking({ ...newBooking, email: e.target.value })}
                     required
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="phone">Phone *</Label>
+                  <Label htmlFor="phone" className="text-gray-300">
+                    Phone *
+                  </Label>
                   <Input
                     id="phone"
                     value={newBooking.phone}
                     onChange={(e) => setNewBooking({ ...newBooking, phone: e.target.value })}
                     required
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="company">Company *</Label>
+                  <Label htmlFor="company" className="text-gray-300">
+                    Company *
+                  </Label>
                   <Input
                     id="company"
                     value={newBooking.company_name}
                     onChange={(e) => setNewBooking({ ...newBooking, company_name: e.target.value })}
                     required
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Service Category *</Label>
+                  <Label className="text-gray-300">Service Category *</Label>
                   <Select
                     value={newBooking.service_category}
                     onValueChange={(value) =>
                       setNewBooking({ ...newBooking, service_category: value, service_subcategory: "" })
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-700 text-white border-gray-600">
                       {serviceCategories.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
+                        <SelectItem key={cat.value} value={cat.value} className="hover:bg-gray-600">
                           {cat.label}
                         </SelectItem>
                       ))}
@@ -847,18 +861,18 @@ export function BookingsManagement() {
                   </Select>
                 </div>
                 <div>
-                  <Label>Service Subcategory *</Label>
+                  <Label className="text-gray-300">Service Subcategory *</Label>
                   <Select
                     value={newBooking.service_subcategory}
                     onValueChange={(value) => setNewBooking({ ...newBooking, service_subcategory: value })}
                     disabled={!newBooking.service_category}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                       <SelectValue placeholder="Select subcategory" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-gray-700 text-white border-gray-600">
                       {(subcategories[newBooking.service_category] || []).map((sub) => (
-                        <SelectItem key={sub.value} value={sub.value}>
+                        <SelectItem key={sub.value} value={sub.value} className="hover:bg-gray-600">
                           {sub.label}
                         </SelectItem>
                       ))}
@@ -868,48 +882,69 @@ export function BookingsManagement() {
               </div>
 
               <div>
-                <Label htmlFor="description">Project Description</Label>
-                <Textarea // Changed from textarea to Textarea component
+                <Label htmlFor="description" className="text-gray-300">
+                  Project Description
+                </Label>
+                <Textarea
                   id="description"
                   value={newBooking.project_description}
                   onChange={(e) => setNewBooking({ ...newBooking, project_description: e.target.value })}
                   rows={3}
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Budget Range</Label>
+                  <Label className="text-gray-300">Budget Range</Label>
                   <Select
                     value={newBooking.budget_range}
                     onValueChange={(value) => setNewBooking({ ...newBooking, budget_range: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                       <SelectValue placeholder="Select budget" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="under-5000">Under AED 5,000</SelectItem>
-                      <SelectItem value="5000-10000">AED 5,000 - 10,000</SelectItem>
-                      <SelectItem value="10000-20000">AED 10,000 - 20,000</SelectItem>
-                      <SelectItem value="20000-50000">AED 20,000 - 50,000</SelectItem>
-                      <SelectItem value="above-50000">Above AED 50,000</SelectItem>
+                    <SelectContent className="bg-gray-700 text-white border-gray-600">
+                      <SelectItem value="under-5000" className="hover:bg-gray-600">
+                        Under AED 5,000
+                      </SelectItem>
+                      <SelectItem value="5000-10000" className="hover:bg-gray-600">
+                        AED 5,000 - 10,000
+                      </SelectItem>
+                      <SelectItem value="10000-20000" className="hover:bg-gray-600">
+                        AED 10,000 - 20,000
+                      </SelectItem>
+                      <SelectItem value="20000-50000" className="hover:bg-gray-600">
+                        AED 20,000 - 50,000
+                      </SelectItem>
+                      <SelectItem value="above-50000" className="hover:bg-gray-600">
+                        Above AED 50,000
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Timeline</Label>
+                  <Label className="text-gray-300">Timeline</Label>
                   <Select
                     value={newBooking.timeline}
                     onValueChange={(value) => setNewBooking({ ...newBooking, timeline: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                       <SelectValue placeholder="Select timeline" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="urgent">Urgent (Within 1 week)</SelectItem>
-                      <SelectItem value="short">Short (1-2 weeks)</SelectItem>
-                      <SelectItem value="medium">Medium (2-4 weeks)</SelectItem>
-                      <SelectItem value="flexible">Flexible</SelectItem>
+                    <SelectContent className="bg-gray-700 text-white border-gray-600">
+                      <SelectItem value="urgent" className="hover:bg-gray-600">
+                        Urgent (Within 1 week)
+                      </SelectItem>
+                      <SelectItem value="short" className="hover:bg-gray-600">
+                        Short (1-2 weeks)
+                      </SelectItem>
+                      <SelectItem value="medium" className="hover:bg-gray-600">
+                        Medium (2-4 weeks)
+                      </SelectItem>
+                      <SelectItem value="flexible" className="hover:bg-gray-600">
+                        Flexible
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -917,26 +952,32 @@ export function BookingsManagement() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="date">Scheduled Date</Label>
+                  <Label htmlFor="date" className="text-gray-300">
+                    Scheduled Date
+                  </Label>
                   <Input
                     id="date"
                     type="date"
                     value={newBooking.scheduled_date}
                     onChange={(e) => setNewBooking({ ...newBooking, scheduled_date: e.target.value })}
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="time">Scheduled Time</Label>
+                  <Label htmlFor="time" className="text-gray-300">
+                    Scheduled Time
+                  </Label>
                   <Input
                     id="time"
                     type="time"
                     value={newBooking.scheduled_time}
                     onChange={(e) => setNewBooking({ ...newBooking, scheduled_time: e.target.value })}
+                    className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                   />
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-[#bbcb00] hover:bg-[#a8b800] text-black">
+              <Button type="submit" className="w-full bg-[#C4D600] hover:bg-[#b8c200] text-black font-semibold">
                 Create Booking
               </Button>
             </form>
@@ -945,20 +986,19 @@ export function BookingsManagement() {
       </div>
 
       {pendingModifications > 0 && (
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-center gap-3">
-          <AlertTriangle className="h-5 w-5 text-orange-600" />
+        <div className="bg-orange-900 border border-orange-700 rounded-lg p-4 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-orange-400" />
           <div>
-            <p className="font-medium text-orange-800">
+            <p className="font-medium text-orange-200">
               {pendingModifications} Pending Modification Request{pendingModifications > 1 ? "s" : ""}
             </p>
-            <p className="text-sm text-orange-700">
+            <p className="text-sm text-orange-100">
               Clients have requested cancellations or reschedules that need your approval.
             </p>
           </div>
         </div>
       )}
 
-      {/* Search and Filters (Updated from updates) */}
       <div className="flex gap-4 items-center">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -966,52 +1006,51 @@ export function BookingsManagement() {
             placeholder="Search bookings..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:ring-lime-400 focus:border-lime-400"
           />
         </div>
         <div className="flex gap-2">
-          {["all", "past", "today", "upcoming"].map(
-            (
-              filter, // Updated filter options
-            ) => (
-              <Button
-                key={filter}
-                variant={dateFilter === filter ? "default" : "outline"}
-                size="sm"
-                onClick={() => setDateFilter(filter)}
-                className={dateFilter === filter ? "bg-[#bbcb00] text-black hover:bg-[#a8b800]" : ""}
-              >
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
-              </Button>
-            ),
-          )}
+          {["all", "past", "today", "upcoming"].map((filter) => (
+            <Button
+              key={filter}
+              variant={dateFilter === filter ? "default" : "outline"}
+              size="sm"
+              onClick={() => setDateFilter(filter)}
+              className={
+                dateFilter === filter
+                  ? "bg-[#C4D600] text-black hover:bg-[#b8c200] font-semibold"
+                  : "bg-gray-800 text-gray-200 border-gray-700 hover:bg-gray-700 hover:text-white"
+              }
+            >
+              {filter.charAt(0).toUpperCase() + filter.slice(1)}
+            </Button>
+          ))}
         </div>
-        {/* Display real-time connection status and new bookings count */}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
+        <div className="flex items-center gap-2 text-sm text-gray-300">
           {isRealtimeConnected ? (
-            <Wifi className="h-4 w-4 text-green-500" />
+            <Wifi className="h-4 w-4 text-[#C4D600]" />
           ) : (
             <WifiOff className="h-4 w-4 text-red-500" />
           )}
           {newBookingsCount > 0 && (
-            <Badge className="bg-blue-100 text-blue-800 border-blue-300 cursor-pointer" onClick={fetchBookings}>
+            <Badge className="bg-blue-600 text-white border-blue-500 cursor-pointer" onClick={fetchBookings}>
               {newBookingsCount} New Booking{newBookingsCount > 1 ? "s" : ""}
             </Badge>
           )}
-          <span className="ml-2">Last updated: {lastFetchTime.toLocaleTimeString()}</span>
+          <span className="ml-2 text-gray-400">Last updated: {lastFetchTime.toLocaleTimeString()}</span>
         </div>
       </div>
 
       {/* Bookings List */}
       <div className="space-y-4">
-        {filteredBookings.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg border">
-            <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No bookings found</p>
+        {filteredAndSearchedBookings.length === 0 ? (
+          <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+            <Calendar className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+            <p className="text-gray-400">No bookings found</p>
           </div>
         ) : (
-          filteredBookings.map((booking) => {
-            const client = clients.find((c) => c.user_id === booking.user_id)
+          filteredAndSearchedBookings.map((booking) => {
+            const client = clientsMap.get(booking.client_id || "")
             // Added check for modification pending status from updates
             const isModificationPending =
               booking.status === "pending_cancellation" || booking.status === "pending_reschedule"
@@ -1024,56 +1063,57 @@ export function BookingsManagement() {
             return (
               <div
                 key={booking.id}
-                className={`bg-white rounded-lg border p-4 ${isTomorrow ? "border-orange-400 ring-2 ring-orange-200" : ""} ${isModificationPending ? "border-l-4 border-l-orange-500" : ""}`}
+                className={`bg-gray-800 rounded-lg border p-4 ${isTomorrow ? "border-orange-400 ring-2 ring-orange-200" : "border-gray-700"} ${isModificationPending ? "border-l-4 border-l-orange-500" : ""}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline" className="font-mono">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <Badge variant="outline" className="font-mono bg-gray-700 text-gray-100 border-gray-600">
                         <Hash className="h-3 w-3 mr-1" />
                         {booking.booking_number || "Generating..."}
                       </Badge>
                       {client && (
-                        <Badge variant="secondary" className="font-mono">
+                        <Badge variant="secondary" className="font-mono bg-gray-700 text-gray-100 border-gray-600">
                           <Building2 className="h-3 w-3 mr-1" />
                           {client.client_number}
                         </Badge>
                       )}
-                      {/* Updated badge for status, including new pending states */}
-                      <Badge className={`${statusColors[booking.status]} border`}>
+                      <Badge className={`${statusColors[booking.status]} border font-semibold`}>
                         {booking.status === "pending_cancellation" && <XCircle className="h-3 w-3 mr-1" />}
                         {booking.status === "pending_reschedule" && <RefreshCw className="h-3 w-3 mr-1" />}
                         {booking.status === "confirmed" && <CheckCircle className="h-3 w-3 mr-1" />}
                         {booking.status.replace("_", " ")}
                       </Badge>
                       {booking.status === "confirmed" && (
-                        <Badge className={`${projectStatusColors[booking.project_status || "upcoming"]} border`}>
+                        <Badge
+                          className={`${projectStatusColors[booking.project_status || "upcoming"]} border font-semibold`}
+                        >
                           {booking.project_status === "in_progress"
                             ? "Shooting"
                             : booking.project_status?.replace("_", " ") || "upcoming"}
                         </Badge>
                       )}
                       {isTomorrow && (
-                        <Badge className="bg-orange-100 text-orange-800 border-orange-300 border">
+                        <Badge className="bg-orange-600 text-white border-orange-500 border font-semibold">
                           <AlertTriangle className="h-3 w-3 mr-1" />
                           Tomorrow
                         </Badge>
                       )}
                     </div>
 
-                    <h3 className="font-semibold text-lg">
+                    <h3 className="font-semibold text-lg text-white">
                       {booking.name}
-                      {client && <span className="text-gray-500 font-normal text-sm ml-2">({client.name})</span>}
+                      {client && <span className="text-gray-400 font-normal text-sm ml-2">({client.name})</span>}
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-300 font-medium">
                       {booking.service_category?.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase())} -{" "}
                       {booking.service_subcategory}
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-400 mt-1">
                       {booking.email} • {booking.phone}
                     </p>
                     {booking.scheduled_date && (
-                      <p className="text-sm text-gray-700 mt-2 flex items-center gap-1">
+                      <p className="text-sm text-gray-300 mt-2 flex items-center gap-1 font-medium">
                         <Calendar className="h-4 w-4" />
                         {booking.scheduled_date} {booking.scheduled_time && `at ${booking.scheduled_time}`}
                       </p>
@@ -1081,10 +1121,10 @@ export function BookingsManagement() {
 
                     {isModificationPending && (
                       <div
-                        className={`mt-3 p-3 rounded-lg ${booking.status === "pending_cancellation" ? "bg-orange-50" : "bg-purple-50"}`}
+                        className={`mt-3 p-3 rounded-lg ${booking.status === "pending_cancellation" ? "bg-orange-900 border border-orange-700" : "bg-purple-900 border border-purple-700"}`}
                       >
                         <p
-                          className={`font-medium text-sm ${booking.status === "pending_cancellation" ? "text-orange-800" : "text-purple-800"}`}
+                          className={`font-semibold text-sm ${booking.status === "pending_cancellation" ? "text-orange-200" : "text-purple-200"}`}
                         >
                           {booking.status === "pending_cancellation"
                             ? "Cancellation Request"
@@ -1092,22 +1132,32 @@ export function BookingsManagement() {
                         </p>
                         {booking.cancellation_reason && (
                           <p
-                            className={`text-sm mt-1 ${booking.status === "pending_cancellation" ? "text-orange-700" : "text-purple-700"}`}
+                            className={`text-sm mt-1 ${booking.status === "pending_cancellation" ? "text-orange-100" : "text-purple-100"}`}
                           >
                             Reason: {booking.cancellation_reason}
                           </p>
                         )}
-                        <p className="text-xs mt-1 opacity-70">
+                        <p className="text-xs mt-1 text-gray-300">
                           Requested: {new Date(booking.modification_requested_at).toLocaleString()}
                         </p>
                         <div className="flex gap-2 mt-3">
                           {booking.status === "pending_cancellation" ? (
                             <>
-                              <Button size="sm" variant="destructive" onClick={() => approveCancellation(booking.id)}>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => approveCancellation(booking.id)}
+                                className="bg-green-500 hover:bg-green-600 text-white"
+                              >
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Approve Cancel
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => rejectCancellation(booking.id)}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => rejectCancellation(booking.id)}
+                                className="bg-red-700 text-white border-red-600 hover:bg-red-800"
+                              >
                                 <XCircle className="h-3 w-3 mr-1" />
                                 Reject
                               </Button>
@@ -1122,7 +1172,12 @@ export function BookingsManagement() {
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Approve Reschedule
                               </Button>
-                              <Button size="sm" variant="outline" onClick={() => rejectReschedule(booking.id)}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => rejectReschedule(booking.id)}
+                                className="bg-red-700 text-white border-red-600 hover:bg-red-800"
+                              >
                                 <XCircle className="h-3 w-3 mr-1" />
                                 Reject
                               </Button>
@@ -1141,44 +1196,61 @@ export function BookingsManagement() {
                           size="sm"
                           onClick={() => createClientFromBooking(booking)}
                           disabled={submitting}
-                          className="bg-green-600 hover:bg-green-700 text-white gap-1"
+                          className="bg-lime-500 hover:bg-lime-600 text-black font-semibold gap-1"
                         >
                           {submitting ? <Loader2 className="h-3 w-3 animate-spin" /> : <UserPlus className="h-3 w-3" />}
                           Add as Client & Confirm
                         </Button>
                       )}
-                      <div className="flex gap-1">
-                        <Label className="text-xs text-gray-500 self-center mr-2">Status:</Label>
+                      <div className="flex gap-1 items-center">
+                        <Label className="text-xs text-gray-400 mr-2">Status:</Label>
                         <Select value={booking.status} onValueChange={(value) => updateStatus(booking.id, value)}>
-                          <SelectTrigger className="w-[130px] h-9">
+                          <SelectTrigger className="w-[130px] h-9 bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="confirmed">Confirmed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                          <SelectContent className="bg-gray-700 text-white border-gray-600">
+                            <SelectItem value="pending" className="hover:bg-gray-600">
+                              Pending
+                            </SelectItem>
+                            <SelectItem value="confirmed" className="hover:bg-gray-600">
+                              Confirmed
+                            </SelectItem>
+                            <SelectItem value="cancelled" className="hover:bg-gray-600">
+                              Cancelled
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       {booking.status === "confirmed" && (
-                        <div className="flex gap-1">
-                          <Label className="text-xs text-gray-500 self-center mr-2">Project:</Label>
+                        <div className="flex gap-1 items-center">
+                          <Label className="text-xs text-gray-400 mr-2">Project:</Label>
                           <Select
                             value={booking.project_status || "upcoming"}
                             onValueChange={(value) => updateProjectStatus(booking.id, value)}
                           >
-                            <SelectTrigger className="w-[140px] h-9">
+                            <SelectTrigger className="w-[140px] h-9 bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="upcoming">Upcoming</SelectItem>
-                              <SelectItem value="in_progress">Shooting</SelectItem>
-                              <SelectItem value="completed">Completed</SelectItem>
+                            <SelectContent className="bg-gray-700 text-white border-gray-600">
+                              <SelectItem value="upcoming" className="hover:bg-gray-600">
+                                Upcoming
+                              </SelectItem>
+                              <SelectItem value="in_progress" className="hover:bg-gray-600">
+                                Shooting
+                              </SelectItem>
+                              <SelectItem value="completed" className="hover:bg-gray-600">
+                                Completed
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       )}
-                      <Button size="sm" variant="destructive" onClick={() => setDeleteConfirm(booking.id)}>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setDeleteConfirm(booking.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </Button>
@@ -1188,13 +1260,20 @@ export function BookingsManagement() {
 
                 {/* Delete confirmation */}
                 {deleteConfirm === booking.id && (
-                  <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                    <p className="text-red-800 text-sm mb-2">Are you sure you want to delete this booking?</p>
+                  <div className="mt-4 p-3 bg-red-900 rounded-lg border border-red-700">
+                    <p className="text-red-200 text-sm mb-2">
+                      Are you sure you want to delete this booking? This action cannot be undone.
+                    </p>
                     <div className="flex gap-2">
                       <Button size="sm" variant="destructive" onClick={() => handleDelete(booking.id)}>
                         Yes, Delete
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => setDeleteConfirm(null)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setDeleteConfirm(null)}
+                        className="bg-gray-700 text-white border-gray-600 hover:bg-gray-600"
+                      >
                         Cancel
                       </Button>
                     </div>
@@ -1208,21 +1287,21 @@ export function BookingsManagement() {
 
       {/* Add Booking Dialog - Now uses showAddDialog state and DialogTrigger */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white border-gray-700">
           <DialogHeader>
             <DialogTitle>Add New Booking</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleAddBooking} className="space-y-4">
             {/* Select existing client */}
             <div>
-              <Label>Select Existing Client (Optional)</Label>
+              <Label className="text-gray-300">Select Existing Client (Optional)</Label>
               <Select onValueChange={handleClientSelect}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                   <SelectValue placeholder="Choose a client or enter manually" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-700 text-white border-gray-600">
                   {clients.map((client) => (
-                    <SelectItem key={client.id} value={client.user_id || client.id}>
+                    <SelectItem key={client.id} value={client.user_id || client.id} className="hover:bg-gray-600">
                       {client.client_number} - {client.name} ({client.email})
                     </SelectItem>
                   ))}
@@ -1232,62 +1311,74 @@ export function BookingsManagement() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name" className="text-gray-300">
+                  Name *
+                </Label>
                 <Input
                   id="name"
                   value={newBooking.name}
                   onChange={(e) => setNewBooking({ ...newBooking, name: e.target.value })}
                   required
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email" className="text-gray-300">
+                  Email *
+                </Label>
                 <Input
                   id="email"
                   type="email"
                   value={newBooking.email}
                   onChange={(e) => setNewBooking({ ...newBooking, email: e.target.value })}
                   required
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="phone">Phone *</Label>
+                <Label htmlFor="phone" className="text-gray-300">
+                  Phone *
+                </Label>
                 <Input
                   id="phone"
                   value={newBooking.phone}
                   onChange={(e) => setNewBooking({ ...newBooking, phone: e.target.value })}
                   required
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
               <div>
-                <Label htmlFor="company">Company *</Label>
+                <Label htmlFor="company" className="text-gray-300">
+                  Company *
+                </Label>
                 <Input
                   id="company"
                   value={newBooking.company_name}
                   onChange={(e) => setNewBooking({ ...newBooking, company_name: e.target.value })}
                   required
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Service Category *</Label>
+                <Label className="text-gray-300">Service Category *</Label>
                 <Select
                   value={newBooking.service_category}
                   onValueChange={(value) =>
                     setNewBooking({ ...newBooking, service_category: value, service_subcategory: "" })
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-700 text-white border-gray-600">
                     {serviceCategories.map((cat) => (
-                      <SelectItem key={cat.value} value={cat.value}>
+                      <SelectItem key={cat.value} value={cat.value} className="hover:bg-gray-600">
                         {cat.label}
                       </SelectItem>
                     ))}
@@ -1295,18 +1386,18 @@ export function BookingsManagement() {
                 </Select>
               </div>
               <div>
-                <Label>Service Subcategory *</Label>
+                <Label className="text-gray-300">Service Subcategory *</Label>
                 <Select
                   value={newBooking.service_subcategory}
                   onValueChange={(value) => setNewBooking({ ...newBooking, service_subcategory: value })}
                   disabled={!newBooking.service_category}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                     <SelectValue placeholder="Select subcategory" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-700 text-white border-gray-600">
                     {(subcategories[newBooking.service_category] || []).map((sub) => (
-                      <SelectItem key={sub.value} value={sub.value}>
+                      <SelectItem key={sub.value} value={sub.value} className="hover:bg-gray-600">
                         {sub.label}
                       </SelectItem>
                     ))}
@@ -1316,48 +1407,69 @@ export function BookingsManagement() {
             </div>
 
             <div>
-              <Label htmlFor="description">Project Description</Label>
+              <Label htmlFor="description" className="text-gray-300">
+                Project Description
+              </Label>
               <Textarea
                 id="description"
                 value={newBooking.project_description}
                 onChange={(e) => setNewBooking({ ...newBooking, project_description: e.target.value })}
                 rows={3}
+                className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Budget Range</Label>
+                <Label className="text-gray-300">Budget Range</Label>
                 <Select
                   value={newBooking.budget_range}
                   onValueChange={(value) => setNewBooking({ ...newBooking, budget_range: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                     <SelectValue placeholder="Select budget" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="under-5000">Under AED 5,000</SelectItem>
-                    <SelectItem value="5000-10000">AED 5,000 - 10,000</SelectItem>
-                    <SelectItem value="10000-20000">AED 10,000 - 20,000</SelectItem>
-                    <SelectItem value="20000-50000">AED 20,000 - 50,000</SelectItem>
-                    <SelectItem value="above-50000">Above AED 50,000</SelectItem>
+                  <SelectContent className="bg-gray-700 text-white border-gray-600">
+                    <SelectItem value="under-5000" className="hover:bg-gray-600">
+                      Under AED 5,000
+                    </SelectItem>
+                    <SelectItem value="5000-10000" className="hover:bg-gray-600">
+                      AED 5,000 - 10,000
+                    </SelectItem>
+                    <SelectItem value="10000-20000" className="hover:bg-gray-600">
+                      AED 10,000 - 20,000
+                    </SelectItem>
+                    <SelectItem value="20000-50000" className="hover:bg-gray-600">
+                      AED 20,000 - 50,000
+                    </SelectItem>
+                    <SelectItem value="above-50000" className="hover:bg-gray-600">
+                      Above AED 50,000
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label>Timeline</Label>
+                <Label className="text-gray-300">Timeline</Label>
                 <Select
                   value={newBooking.timeline}
                   onValueChange={(value) => setNewBooking({ ...newBooking, timeline: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400">
                     <SelectValue placeholder="Select timeline" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="urgent">Urgent (Within 1 week)</SelectItem>
-                    <SelectItem value="short">Short (1-2 weeks)</SelectItem>
-                    <SelectItem value="medium">Medium (2-4 weeks)</SelectItem>
-                    <SelectItem value="flexible">Flexible</SelectItem>
+                  <SelectContent className="bg-gray-700 text-white border-gray-600">
+                    <SelectItem value="urgent" className="hover:bg-gray-600">
+                      Urgent (Within 1 week)
+                    </SelectItem>
+                    <SelectItem value="short" className="hover:bg-gray-600">
+                      Short (1-2 weeks)
+                    </SelectItem>
+                    <SelectItem value="medium" className="hover:bg-gray-600">
+                      Medium (2-4 weeks)
+                    </SelectItem>
+                    <SelectItem value="flexible" className="hover:bg-gray-600">
+                      Flexible
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1365,26 +1477,32 @@ export function BookingsManagement() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="date">Scheduled Date</Label>
+                <Label htmlFor="date" className="text-gray-300">
+                  Scheduled Date
+                </Label>
                 <Input
                   id="date"
                   type="date"
                   value={newBooking.scheduled_date}
                   onChange={(e) => setNewBooking({ ...newBooking, scheduled_date: e.target.value })}
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
               <div>
-                <Label htmlFor="time">Scheduled Time</Label>
+                <Label htmlFor="time" className="text-gray-300">
+                  Scheduled Time
+                </Label>
                 <Input
                   id="time"
                   type="time"
                   value={newBooking.scheduled_time}
                   onChange={(e) => setNewBooking({ ...newBooking, scheduled_time: e.target.value })}
+                  className="bg-gray-700 text-white border-gray-600 focus:ring-lime-400 focus:border-lime-400"
                 />
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-[#bbcb00] hover:bg-[#a8b800] text-black">
+            <Button type="submit" className="w-full bg-[#C4D600] hover:bg-[#b8c200] text-black font-semibold">
               Create Booking
             </Button>
           </form>
@@ -1393,18 +1511,25 @@ export function BookingsManagement() {
 
       {/* Delete Confirmation Dialog - No change needed here */}
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
-        <DialogContent>
+        <DialogContent className="bg-gray-800 text-white border-gray-700">
           <DialogHeader>
             <DialogTitle>Confirm Deletion</DialogTitle>
           </DialogHeader>
-          <p className="text-gray-600">Are you sure you want to delete this booking? This action cannot be undone.</p>
+          <p className="text-gray-300">Are you sure you want to delete this booking? This action cannot be undone.</p>
           <div className="flex gap-2 justify-end mt-4">
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirm(null)}
+              className="bg-gray-700 text-white border-gray-600 hover:bg-gray-600"
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={() => handleDelete(deleteConfirm!)}>
+            <Button
+              variant="destructive"
+              onClick={() => handleDelete(deleteConfirm!)}
+              className="bg-red-600 hover:bg-red-700"
+            >
               {" "}
-              {/* Use handleDelete */}
               Delete
             </Button>
           </div>

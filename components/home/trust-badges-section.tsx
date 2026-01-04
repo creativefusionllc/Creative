@@ -1,9 +1,9 @@
 "use client"
 
-import { Shield, Award, Clock, Headphones, CheckCircle, Globe } from "lucide-react"
+import { Award, Clock, Headphones, CheckCircle, Globe, CheckCircle as CheckBadge } from "lucide-react"
 
 const badges = [
-  { icon: Shield, label: "ISO Certified" },
+  { icon: CheckBadge, label: "UAE Officially Registered" },
   { icon: Award, label: "Award Winning" },
   { icon: Clock, label: "24/7 Support" },
   { icon: Headphones, label: "Dedicated Team" },
