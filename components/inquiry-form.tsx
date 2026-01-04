@@ -228,7 +228,7 @@ export default function InquiryForm({ onClose, isModal = false }: InquiryFormPro
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-200">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Book Our Solutions</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Book Your Solution Now</h2>
           <p className="text-gray-600 text-sm mt-1">
             Select your solution, and we'll provide pricing and availability details
           </p>
