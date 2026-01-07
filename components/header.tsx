@@ -120,7 +120,7 @@ export function Header() {
             </div>
             <div className="h-4 w-px bg-[#C4D600]/30" />
             <Link
-              href="/admin/login"
+              href="/admin"
               className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-2.5 py-1.5 rounded-lg transition-all hover:shadow-lg font-medium text-xs"
               title="Admin Panel Access"
             >
@@ -280,7 +280,7 @@ export function Header() {
                   ),
                 )}
                 <Link
-                  href="/admin/login"
+                  href="/admin"
                   className="flex items-center gap-1.5 bg-[#C4D600] hover:bg-[#b0c200] text-gray-900 px-3 py-1.5 rounded-lg transition-all font-medium text-xs flex-1"
                   onClick={() => setIsOpen(false)}
                 >

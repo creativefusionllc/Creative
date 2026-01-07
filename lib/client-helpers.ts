@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server"
-import { createServerClient } from "@supabase/ssr"
 
 export async function getOrCreateClient(userId: string, userEmail?: string, userMetadata?: Record<string, string>) {
   const supabase = await createClient()
@@ -29,17 +28,7 @@ export async function getOrCreateClient(userId: string, userEmail?: string, user
   if (!client) {
     const clientNumber = `CL${Date.now().toString().slice(-8)}`
 
-    const serviceSupabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        cookies: {
-          getAll: () => [],
-          setAll: () => {},
-        },
-      },
-    )
-
+    const serviceSupabase = createClient()
     const { data: newClient, error: insertError } = await serviceSupabase
       .from("clients")
       .insert({

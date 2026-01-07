@@ -23,6 +23,7 @@ export function BlogListPage() {
     try {
       setLoading(true)
 
+      // Fetch categories
       const { data: cats } = await supabase.from("blog_categories").select("*").order("created_at")
 
       setCategories(cats || [])
@@ -32,6 +33,7 @@ export function BlogListPage() {
         .from("blog_posts")
         .select("*, category:blog_categories(*)")
         .eq("status", "published")
+        .not("published_at", "is", null) // Only posts with published_at set
         .order("published_at", { ascending: false })
         .limit(50)
 
@@ -46,11 +48,11 @@ export function BlogListPage() {
       const { data: blogPosts, error } = await query
 
       if (error) {
-        console.error("[v0] Blog fetch error:", error.message)
+        console.error("[v0] Blog fetch error:", error)
+      } else {
+        console.log("[v0] Fetched blog posts:", blogPosts?.length || 0)
+        setPosts(blogPosts || [])
       }
-
-      console.log("[v0] Fetched blog posts:", blogPosts?.length || 0)
-      setPosts(blogPosts || [])
     } catch (error) {
       console.error("[v0] Error fetching blog data:", error)
     } finally {
