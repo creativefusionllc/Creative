@@ -39,10 +39,10 @@
 
 Add to Vercel after publishing:
 
-```
+\`\`\`
 RESEND_API_KEY=re_Dr7moHby_KCskUiT5B9YkVS3w7wqdn8V8
 NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000/auth/confirm
-```
+\`\`\`
 
 ## Testing
 

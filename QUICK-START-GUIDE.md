@@ -9,10 +9,10 @@
 1. Open your project in Vercel
 2. Go to Settings → Environment Variables
 3. Add these:
-   ```
+   \`\`\`
    RESEND_API_KEY=re_Dr7moHby_KCskUiT5B9YkVS3w7wqdn8V8
    ENVATO_API_TOKEN=brx4QXmctiVNU95DcqiEhVVG6k0bkmey
-   ```
+   \`\`\`
 4. Redeploy
 
 ## Step 3: Test Multi-Client System (2 minutes)

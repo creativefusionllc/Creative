@@ -39,10 +39,10 @@
 - Backups: Configured
 
 **Test Command:**
-```bash
+\`\`\`bash
 npm run build
 npm run test:database
-```
+\`\`\`
 
 ---
 
@@ -163,22 +163,22 @@ npm run test:database
 ## 🚀 DEPLOYMENT STEPS
 
 ### Step 1: Pre-Deployment Verification (30 min)
-```bash
+\`\`\`bash
 # Run all tests
 npm run build
 npm run test
 npm run lint
-```
+\`\`\`
 
 ✓ Build completes without errors
 ✓ All tests pass
 ✓ No lint warnings
 
 ### Step 2: Database Backup (5 min)
-```bash
+\`\`\`bash
 # Backup current database
 npm run backup:database
-```
+\`\`\`
 
 ### Step 3: Environment Verification (5 min)
 - [ ] All 20+ environment variables set
@@ -190,12 +190,12 @@ npm run backup:database
 Run through the 8 verification checkpoints above
 
 ### Step 5: Production Deployment (5 min)
-```bash
+\`\`\`bash
 # Deploy to production
 npm run deploy
 # or via Vercel:
 vercel --prod
-```
+\`\`\`
 
 ### Step 6: Post-Deployment Verification (10 min)
 - [ ] Website loads without errors
@@ -253,6 +253,6 @@ If any issues occur:
 
 Generated: 2025-12-15
 Version: v517 (Deployment Ready)
-```
+\`\`\`
 
 Now create the deployment commands script:

@@ -27,16 +27,16 @@ A comprehensive digital marketing agency platform built with Next.js 16, React 1
 ## Getting Started
 
 1. Install dependencies:
-```bash
+\`\`\`bash
 npm install
-```
+\`\`\`
 
 2. Set up environment variables (see Vercel dashboard)
 
 3. Run development server:
-```bash
+\`\`\`bash
 npm run dev
-```
+\`\`\`
 
 4. Open [http://localhost:3000](http://localhost:3000)
 

@@ -9,7 +9,7 @@
 - `geo` - Coordinates were strings, needed to be numbers
 
 **Solution:** Updated `app/layout.tsx` with proper schema.org formatting:
-```json
+\`\`\`json
 "openingHoursSpecification": [
   {
     "@type": "OpeningHoursSpecification",
@@ -24,7 +24,7 @@
   "latitude": 25.3463,
   "longitude": 55.4209
 }
-```
+\`\`\`
 
 ### 2. Missing Image (FIXED)
 **Issue:** `testimonial-client-1-professional-businessman.jpg` was returning 404

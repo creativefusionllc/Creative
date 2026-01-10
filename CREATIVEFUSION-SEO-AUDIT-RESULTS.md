@@ -111,20 +111,20 @@ Your Creative Fusion website has **CRITICAL SEO ISSUES** that are preventing you
 ### Meta Tags Analysis
 
 **Homepage:**
-```html
+\`\`\`html
 ✅ Title: "Creative Fusion LLC - Creative Fusion LLC | Media Production & Advertising Agency Dubai" (68 chars)
 ⚠️ Description: Missing or not found
 ❌ Keywords: Not implemented
 ✅ Viewport: Responsive
 ✅ Charset: UTF-8
-```
+\`\`\`
 
 **Services Page:**
-```html
+\`\`\`html
 ⚠️ Title: "Services - Creative Fusion LLC" (Generic, needs optimization)
 ❌ Description: Missing
 ❌ H1: "what we're offering" (Should be "Creative Fusion Services Dubai")
-```
+\`\`\`
 
 ### URL Structure
 **Current:** Good structure with clean URLs
